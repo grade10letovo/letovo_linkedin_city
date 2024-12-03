@@ -47,12 +47,12 @@ public class UniversityDataFetcher : MonoBehaviour
 
     public async Task<List<University>> GetUniversitiesFromApi()
     {
-        if (apiConfig == null || string.IsNullOrEmpty(apiConfig.apiUrl))
+        if (apiConfig == null || string.IsNullOrEmpty(apiConfig.apiDomen) || string.IsNullOrEmpty(apiConfig.apiUniversityUrl))
         {
             throw new Exception("API URL is not configured.");
         }
 
-        HttpResponseMessage response = await _httpClient.GetAsync(apiConfig.apiUrl);
+        HttpResponseMessage response = await _httpClient.GetAsync(apiConfig.apiDomen + apiConfig.apiUniversityUrl);
         if (!response.IsSuccessStatusCode)
         {
             throw new Exception($"Error fetching data: {response.ReasonPhrase}");
