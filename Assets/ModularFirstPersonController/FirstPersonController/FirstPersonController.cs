@@ -18,6 +18,7 @@ using Mirror;
 public class FirstPersonController : NetworkBehaviour
 {
     private Rigidbody rb;
+    private bool isChatMode = false;
 
     #region Camera Movement Variables
 
@@ -150,6 +151,11 @@ public class FirstPersonController : NetworkBehaviour
 
     private void Update()
     {
+        if (isChatMode)
+        {
+            return;
+        }
+        
         #region Camera
 
         // Control camera movement
@@ -307,6 +313,10 @@ public class FirstPersonController : NetworkBehaviour
 
     void FixedUpdate()
     {
+        if (isChatMode)
+        {
+            return;
+        }
         #region Movement
 
         if (playerCanMove && isLocalPlayer)
@@ -457,6 +467,12 @@ public class FirstPersonController : NetworkBehaviour
             joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
         }
     }
+    
+    public void SetChatMode(bool isActive)
+    {
+        isChatMode = isActive;
+    }
+
 }
 
 
