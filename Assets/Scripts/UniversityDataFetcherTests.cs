@@ -46,7 +46,7 @@ public class UniversityDataFetcherTests
         var fetcher = new UniversityDataFetcher(mockHttpClient) { apiConfig = mockConfig };
 
         // Act
-        List<UniversityDataFetcher.University> universities = await fetcher.GetUniversitiesFromApi();
+        List<University> universities = await fetcher.GetUniversitiesFromApi();
 
         // Assert
         Assert.AreEqual(1, universities.Count);

@@ -7,14 +7,6 @@ using UnityEngine;
 public class UniversityDataFetcher : MonoBehaviour
 {
     [Serializable]
-    public class University
-    {
-        public string name;
-        public float latitude;
-        public float longitude;
-    }
-
-    [Serializable]
     public class UniversityList
     {
         public List<University> universities;

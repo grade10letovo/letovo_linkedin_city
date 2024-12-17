@@ -5,4 +5,5 @@ public class APIConfigSO : ScriptableObject
 {
     public string apiDomen = "https://your-default-api-url.com";
     public string apiUniversityUrl = "/universities";
+    public bool mockAPI = false;
 }
