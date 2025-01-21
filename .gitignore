@@ -23,7 +23,7 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
 
 # Thumbnails
 ._*
@@ -224,5 +224,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+*.meta
 
 # End of https://www.toptal.com/developers/gitignore/api/unity,rider,macos,windows,linux
