@@ -12,9 +12,16 @@ namespace UnityStandardAssets.Cameras
             ManualUpdate, // user must call to update camera
         }
 
-        [SerializeField] protected Transform m_Target;            // The target object to follow
-        [SerializeField] private bool m_AutoTargetPlayer = true;  // Whether the rig should automatically target the player.
-        [SerializeField] private UpdateType m_UpdateType;         // stores the selected update type
+        [SerializeField]
+        protected Transform m_Target; // The target object to follow
+
+        [SerializeField]
+        private bool
+            m_AutoTargetPlayer =
+                true; // Whether the rig should automatically target the player.
+
+        [SerializeField]
+        private UpdateType m_UpdateType; // stores the selected update type
 
         protected Rigidbody targetRigidbody;
 
@@ -27,6 +34,7 @@ namespace UnityStandardAssets.Cameras
             {
                 FindAndTargetPlayer();
             }
+
             if (m_Target == null) return;
             targetRigidbody = m_Target.GetComponent<Rigidbody>();
         }
@@ -36,10 +44,12 @@ namespace UnityStandardAssets.Cameras
         {
             // we update from here if updatetype is set to Fixed, or in auto mode,
             // if the target has a rigidbody, and isn't kinematic.
-            if (m_AutoTargetPlayer && (m_Target == null || !m_Target.gameObject.activeSelf))
+            if (m_AutoTargetPlayer &&
+                (m_Target == null || !m_Target.gameObject.activeSelf))
             {
                 FindAndTargetPlayer();
             }
+
             if (m_UpdateType == UpdateType.FixedUpdate)
             {
                 FollowTarget(Time.deltaTime);
@@ -51,10 +61,12 @@ namespace UnityStandardAssets.Cameras
         {
             // we update from here if updatetype is set to Late, or in auto mode,
             // if the target does not have a rigidbody, or - does have a rigidbody but is set to kinematic.
-            if (m_AutoTargetPlayer && (m_Target == null || !m_Target.gameObject.activeSelf))
+            if (m_AutoTargetPlayer &&
+                (m_Target == null || !m_Target.gameObject.activeSelf))
             {
                 FindAndTargetPlayer();
             }
+
             if (m_UpdateType == UpdateType.LateUpdate)
             {
                 FollowTarget(Time.deltaTime);
@@ -66,10 +78,12 @@ namespace UnityStandardAssets.Cameras
         {
             // we update from here if updatetype is set to Late, or in auto mode,
             // if the target does not have a rigidbody, or - does have a rigidbody but is set to kinematic.
-            if (m_AutoTargetPlayer && (m_Target == null || !m_Target.gameObject.activeSelf))
+            if (m_AutoTargetPlayer &&
+                (m_Target == null || !m_Target.gameObject.activeSelf))
             {
                 FindAndTargetPlayer();
             }
+
             if (m_UpdateType == UpdateType.ManualUpdate)
             {
                 FollowTarget(Time.deltaTime);
