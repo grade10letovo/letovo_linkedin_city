@@ -219,7 +219,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 291793386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51244a621b43d764fb426c63b7efbbf1, type: 3}
+  m_Script: {fileID: 11500000, guid: fd2583f839111fb459616393b49a316a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   islandPrefab: {fileID: 2021359211}
