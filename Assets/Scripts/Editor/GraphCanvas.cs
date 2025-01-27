@@ -32,34 +32,25 @@ public class GraphCanvas : GraphView
             }
         }
 
-       
-
         return graphViewChange;
     }
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
     {
-        Debug.Log("START");
         List<Port> connectionList = new List<Port>();
-        Debug.Log(ports.ToList().Count);
-        Debug.Log(startPort);
         ports.ForEach(port =>
         {
             if (port == startPort)
             {
-                Debug.Log("1");
                 return;
             }
             if (port.node == startPort.node)
             {
-                Debug.Log("2");
                 return;
             }
             if (port.direction == startPort.direction)
             {
-                Debug.Log("3");
                 return;
             }
-            Debug.Log("CHECKED");
             connectionList.Add(port);
         });
         return connectionList;
