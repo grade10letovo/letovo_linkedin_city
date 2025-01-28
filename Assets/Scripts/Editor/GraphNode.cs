@@ -1,16 +1,18 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEngine;
-using System.Security.Cryptography;
+using System;
 
 public class GraphNode : Node
 {
     public string nodeName;
+    public string nodeID;
 
-    public GraphNode(string name, Vector2 position)
+    public GraphNode(string name, Vector2 position, string nodeID = null)
     {
         nodeName = name;
-
+        if (nodeID == null)
+            this.nodeID = GenerateUniqueId();
         style.position = Position.Absolute;
         style.left = position.x;
         style.top = position.y;
@@ -35,6 +37,7 @@ public class GraphNode : Node
 
         RefreshExpandedState();
         RefreshPorts();
+        Debug.Log($"Created node with ID {nodeID}");
     }
 
     private Port CreatePort(string portName, Direction direction)
@@ -43,5 +46,9 @@ public class GraphNode : Node
         port.portName = portName;
 
         return port;
+    }
+    private static string GenerateUniqueId()
+    {
+        return Guid.NewGuid().ToString();
     }
 }
