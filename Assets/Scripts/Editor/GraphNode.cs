@@ -9,6 +9,7 @@ public class GraphNode : Node
     public string nodeName;
     public string nodeID;
     public List<string> universities;
+    private List<string> dropdownOptions = new List<string> { "Brown University", "НИУ ВШЭ", "Yale University", "РАНХиГС", "Not selected" }; // Доступные опции для выбора
 
     public GraphNode(string name, Vector2 position, string nodeID = null)
     {
@@ -16,45 +17,64 @@ public class GraphNode : Node
         if (nodeID == null)
             this.nodeID = GenerateUniqueId();
         universities = new List<string>();
+
         style.position = Position.Absolute;
         style.left = position.x;
         style.top = position.y;
         style.backgroundColor = new StyleColor(Color.white);
         style.width = 150;
-        style.height = 70;
 
-        // Устанавливаем имя узла
-        title = nodeName;
+        // Создаём заголовок узла как редактируемое текстовое поле
+        var titleTextField = new TextField
+        {
+            value = nodeName,
+            style =
+        {
+            unityTextAlign = TextAnchor.MiddleCenter,
+            unityFontStyleAndWeight = FontStyle.Bold,
+            marginBottom = 10,
+            marginTop = 10
+        }
+        };
 
-        // Создаём входной порт
+        titleTextField.RegisterValueChangedCallback(evt =>
+        {
+            nodeName = evt.newValue; // Обновляем название узла
+            title = nodeName; // Обновляем заголовок в GraphView
+        });
+
+        // Удаляем стандартный заголовок и добавляем новое поле
+        titleContainer.Clear();
+        titleContainer.Add(titleTextField);
+
+        // Создаём входной и выходной порты
         var inputPort = CreatePort("Input", Direction.Input);
         inputContainer.Add(inputPort);
-        Debug.Log("Created input port");
-        // Создаём выходной порт
+
         var outputPort = CreatePort("Output", Direction.Output);
         outputContainer.Add(outputPort);
-        Debug.Log("Created output port");
+
         // Список строк
         var listContainer = new VisualElement();
         listContainer.style.marginTop = 10;
 
-        var listLabel = new Label("Items:");
+        var listLabel = new Label("Universities:");
         listLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         listContainer.Add(listLabel);
 
         foreach (var item in universities)
         {
-            listContainer.Add(CreateListItem(item));
+            listContainer.Add(CreateDropdownItem(item));
         }
 
         var addItemButton = new Button(() =>
         {
-            AddItemToList("New University", listContainer);
+            AddDropdownItem("Not selected", listContainer);
         })
         {
             text = "Add University"
         };
-        // Кнопка добавления строки
+
         addItemButton.style.marginTop = 5;
         addItemButton.style.marginBottom = 5;
         listContainer.Add(addItemButton);
@@ -67,8 +87,8 @@ public class GraphNode : Node
         RefreshExpandedState();
         RefreshPorts();
         RefreshSize();
-        Debug.Log($"Created node with ID {nodeID}");
     }
+
 
     private Port CreatePort(string portName, Direction direction)
     {
@@ -77,52 +97,82 @@ public class GraphNode : Node
 
         return port;
     }
+
     private void RefreshSize()
     {
-        this.RefreshExpandedState(); // Раскрываем нод
-        this.RefreshPorts();         // Обновляем порты
-        var containerHeight = mainContainer.resolvedStyle.height;
-        this.style.height = containerHeight + 10; // Добавляем отступ для корректного отображения
+        // Обновляем состояние нода
+        RefreshExpandedState();
+        RefreshPorts();
+
+        // Высчитываем высоту контейнера
+        float totalHeight = 40; // Базовая высота узла
+        foreach (var child in mainContainer.Children())
+        {
+            totalHeight += child.resolvedStyle.height + child.resolvedStyle.marginTop + child.resolvedStyle.marginBottom;
+        }
+
+        // Устанавливаем высоту узла с учётом содержимого
+        style.height = totalHeight; // Немного добавим для отступов
     }
+
+
+    private float CalculateContainerHeight()
+    {
+        float height = resolvedStyle.paddingTop + resolvedStyle.paddingBottom;
+
+        // Считаем высоту всех дочерних элементов
+        foreach (var child in mainContainer.Children())
+        {
+            height += child.resolvedStyle.height + child.resolvedStyle.marginTop + child.resolvedStyle.marginBottom;
+        }
+
+        return height;
+    }
+
     private static string GenerateUniqueId()
     {
         return Guid.NewGuid().ToString();
     }
 
-    private VisualElement CreateListItem(string text)
-{
-    var listItem = new TextField { value = text, style = { flexGrow = 1, marginRight = 5 } };
-    listItem.RegisterValueChangedCallback(evt =>
+    private VisualElement CreateDropdownItem(string selectedItem)
     {
-        int index = universities.IndexOf(text);
-        if (index != -1)
+        // Выпадающий список
+        var dropdown = new DropdownField(dropdownOptions, selectedItem);
+        dropdown.RegisterValueChangedCallback(evt =>
         {
-            universities[index] = evt.newValue;
-        }
-    });
+            int index = universities.IndexOf(selectedItem);
+            if (index != -1)
+            {
+                universities[index] = evt.newValue;
+            }
+        });
 
-    var removeButton = new Button(() =>
+        // Кнопка для удаления элемента
+        var removeButton = new Button(() =>
+        {
+            universities.Remove(selectedItem);
+            dropdown.parent.RemoveFromHierarchy();
+            RefreshSize(); // Обновляем размер при удалении элемента
+        })
+        {
+            text = "X",
+            style = { marginLeft = 5 }
+        };
+
+        // Контейнер для строки
+        var itemContainer = new VisualElement();
+        itemContainer.style.flexDirection = FlexDirection.Row;
+        itemContainer.style.marginBottom = 5;
+        itemContainer.Add(dropdown);
+        itemContainer.Add(removeButton);
+
+        return itemContainer;
+    }
+
+    private void AddDropdownItem(string defaultItem, VisualElement listContainer)
     {
-        universities.Remove(text);
-        listItem.parent.RemoveFromHierarchy();
-    })
-    {
-        text = "X",
-        style = { marginLeft = 5 }  
-    };
-
-    var itemContainer = new VisualElement();
-    itemContainer.style.flexDirection = FlexDirection.Row;
-    itemContainer.style.marginBottom = 5;
-    itemContainer.Add(listItem);
-    itemContainer.Add(removeButton);
-
-    return itemContainer;
-}
-
-private void AddItemToList(string newItem, VisualElement listContainer)
-{
-    universities.Add(newItem);
-    listContainer.Insert(listContainer.childCount - 1, CreateListItem(newItem)); // Добавляем перед кнопкой
-}
+        universities.Add(defaultItem);
+        listContainer.Insert(listContainer.childCount - 1, CreateDropdownItem(defaultItem)); // Добавляем перед кнопкой
+        RefreshSize(); // Обновляем размер при добавлении нового элемента
+    }
 }
