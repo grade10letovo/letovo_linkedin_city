@@ -15,6 +15,7 @@ public class GraphNode : Node
         nodeName = name;
         if (nodeID == null)
             this.nodeID = GenerateUniqueId();
+        universities = new List<string>();
         style.position = Position.Absolute;
         style.left = position.x;
         style.top = position.y;
@@ -53,6 +54,9 @@ public class GraphNode : Node
         {
             text = "Add University"
         };
+        // Кнопка добавления строки
+        addItemButton.style.marginTop = 5;
+        addItemButton.style.marginBottom = 5;
         listContainer.Add(addItemButton);
 
         mainContainer.Add(listContainer);
@@ -62,6 +66,7 @@ public class GraphNode : Node
 
         RefreshExpandedState();
         RefreshPorts();
+        RefreshSize();
         Debug.Log($"Created node with ID {nodeID}");
     }
 
@@ -72,6 +77,13 @@ public class GraphNode : Node
 
         return port;
     }
+    private void RefreshSize()
+    {
+        this.RefreshExpandedState(); // Раскрываем нод
+        this.RefreshPorts();         // Обновляем порты
+        var containerHeight = mainContainer.resolvedStyle.height;
+        this.style.height = containerHeight + 10; // Добавляем отступ для корректного отображения
+    }
     private static string GenerateUniqueId()
     {
         return Guid.NewGuid().ToString();
@@ -79,7 +91,7 @@ public class GraphNode : Node
 
     private VisualElement CreateListItem(string text)
 {
-    var listItem = new TextField { value = text };
+    var listItem = new TextField { value = text, style = { flexGrow = 1, marginRight = 5 } };
     listItem.RegisterValueChangedCallback(evt =>
     {
         int index = universities.IndexOf(text);
@@ -95,11 +107,13 @@ public class GraphNode : Node
         listItem.parent.RemoveFromHierarchy();
     })
     {
-        text = "X"
+        text = "X",
+        style = { marginLeft = 5 }  
     };
 
     var itemContainer = new VisualElement();
     itemContainer.style.flexDirection = FlexDirection.Row;
+    itemContainer.style.marginBottom = 5;
     itemContainer.Add(listItem);
     itemContainer.Add(removeButton);
 
