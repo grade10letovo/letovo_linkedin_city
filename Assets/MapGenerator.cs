@@ -101,10 +101,6 @@ public class MapGenerator : MonoBehaviour
 
         // Загрузка данных
         LoadData();
-
-        // Подключение кнопки
-        var generateButton = GameObject.Find("GenerateButton").GetComponent<UnityEngine.UI.Button>();
-        generateButton.onClick.AddListener(GenerateMap);
     }
 
     private void LoadData()
