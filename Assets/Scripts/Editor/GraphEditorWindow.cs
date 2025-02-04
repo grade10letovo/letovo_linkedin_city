@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,22 +13,20 @@ public class GraphEditorWindow : EditorWindow
     {
         var window = GetWindow<GraphEditorWindow>();
         window.titleContent = new GUIContent("Graph Editor");
-        window.minSize = new Vector2(600, 400);
+        window.minSize = new Vector2(300, 300);
     }
 
     private void CreateGUI()
     {
-        // Создаём корневой элемент интерфейса
-        VisualElement root = rootVisualElement;
-
         // Добавляем канвас
         canvas = new GraphCanvas();
-        root.Add(canvas);
+        rootVisualElement.Add(canvas);
 
-        // Добавляем панель инструментов
+        CreateToolbar();
+    }
+    private void CreateToolbar()
+    {
         var toolbar = new Toolbar();
-        root.Add(toolbar);
-
         // Кнопка для создания узлов
         var createNodeButton = new Button(() =>
         {
@@ -35,11 +34,45 @@ public class GraphEditorWindow : EditorWindow
             var nodeName = "Node " + (canvas.childCount + 1);
             var node = new GraphNode(nodeName, new Vector2(200, 200));
             canvas.AddElement(node);
+            Debug.Log("Create node");
+            Debug.Log(canvas.nodes.ToList().Count);
         })
         {
             text = "Add Node"
         };
-
         toolbar.Add(createNodeButton);
+
+        var saveButton = new Button(() => SaveGraph()) { text = "Save Graph" };
+        toolbar.Add(saveButton);
+
+        var loadButton = new Button(() => LoadGraph()) { text = "Load Graph" };
+        toolbar.Add(loadButton);
+
+        rootVisualElement.Add(toolbar);
+    }
+    private void SaveGraph()
+    {
+        string path = EditorUtility.SaveFilePanel("Save Graph", "", "Graph", "json");
+        if (!string.IsNullOrEmpty(path))
+        {
+            SaveUtility.SaveGraph(canvas, path);
+        }
+        else
+        {
+            Debug.LogWarning("Save operation was canceled.");
+        }
+    }
+
+    private void LoadGraph()
+    {
+        string path = EditorUtility.OpenFilePanel("Load Graph", "", "json");
+        if (!string.IsNullOrEmpty(path))
+        {
+            SaveUtility.LoadGraph(canvas, path);
+        }
+        else
+        {
+            Debug.LogWarning("Load operation was canceled.");
+        }
     }
 }
