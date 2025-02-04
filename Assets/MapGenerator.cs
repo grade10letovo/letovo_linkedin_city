@@ -152,4 +152,12 @@ public class MapGenerator : MonoBehaviour
 
         Debug.Log("GenerateMap completed");
     }
+    public void GenerateMapFromEditor()
+    {
+        // Выполняем стандартную генерацию
+        LoadData();
+        GenerateMap();
+        Debug.Log("Map generated from editor!");
+    }
 }
+
