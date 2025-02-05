@@ -101,10 +101,6 @@ public class MapGenerator : MonoBehaviour
 
         // Загрузка данных
         LoadData();
-
-        // Подключение кнопки
-        var generateButton = GameObject.Find("GenerateButton").GetComponent<UnityEngine.UI.Button>();
-        generateButton.onClick.AddListener(GenerateMap);
     }
 
     private void LoadData()
@@ -152,4 +148,12 @@ public class MapGenerator : MonoBehaviour
 
         Debug.Log("GenerateMap completed");
     }
+    public void GenerateMapFromEditor()
+    {
+        // Выполняем стандартную генерацию
+        LoadData();
+        GenerateMap();
+        Debug.Log("Map generated from editor!");
+    }
 }
+
