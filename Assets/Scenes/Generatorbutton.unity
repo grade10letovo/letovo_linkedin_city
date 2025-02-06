@@ -222,10 +222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51244a621b43d764fb426c63b7efbbf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 5278706993115044690, guid: f3fc4f2775f994a46969991141716125, type: 3}
-  roadPrefab: {fileID: 8953070253236969226, guid: 5f6b9078fca663549ae83ba419bd2092, type: 3}
-  mapParent: {fileID: 1365826699}
-  vertices: []
 --- !u!114 &291793388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,6 +313,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1365826699}
+  - component: {fileID: 1365826700}
   m_Layer: 0
   m_Name: MapParent
   m_TagString: Untagged
@@ -333,43 +330,27 @@ Transform:
   m_GameObject: {fileID: 1365826698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 440.2, y: 182.2, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1374463147
-GameObject:
+--- !u!114 &1365826700
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1374463148}
-  m_Layer: 0
-  m_Name: Test_for_postgres
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1374463148
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1374463147}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.303211, y: 33.25327, z: -1.1106243}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 1365826698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dc6762ea9efa434bb3c041b36f9f9ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  islandPrefab: {fileID: 5278706993115044690, guid: 47bd8808adf994041b50712abee38275, type: 3}
+  roadPrefab: {fileID: 8953070253236969226, guid: e7122a30d13920e468c0bf80b74bb449, type: 3}
+  mapParent: {fileID: 1365826699}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -377,4 +358,3 @@ SceneRoots:
   - {fileID: 291793391}
   - {fileID: 117406006}
   - {fileID: 1365826699}
-  - {fileID: 1374463148}
