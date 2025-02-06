@@ -1,105 +1,89 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using System.Collections.Generic;
-using System.IO;
+using Npgsql;
 
-// Интерфейс для работы с источником данных
+// РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РёСЃС‚РѕС‡РЅРёРєРѕРј РґР°РЅРЅС‹С…
 public interface IDataReader
 {
     List<Vector3> GetVertices();
     List<(int, int)> GetEdges();
 }
 
-// Mock-реализация источника данных
-public class MockDataReader : IDataReader
+// Р РµР°Р»РёР·Р°С†РёСЏ РёСЃС‚РѕС‡РЅРёРєР° РґР°РЅРЅС‹С… РґР»СЏ PostgreSQL
+public class PostgresDataReader : IDataReader
 {
-    public List<Vector3> GetVertices()
-    {
-        return new List<Vector3>
-        {
-            new Vector3(-5, 0, -5),
-            new Vector3(5, 0, -5),
-            new Vector3(0, 0, 5)
-        };
-    }
-
-    public List<(int, int)> GetEdges()
-    {
-        return new List<(int, int)>
-        {
-            (0, 1),
-            (1, 2),
-            (2, 0)
-        };
-    }
-}
-
-// Чтение данных из файла (пока файл не готов, используем MockDataReader)
-public class FileDataReader : IDataReader
-{
-    private string filePath;
-
-    public FileDataReader(string filePath)
-    {
-        this.filePath = filePath;
-    }
+    private string connectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
 
     public List<Vector3> GetVertices()
     {
         List<Vector3> vertices = new List<Vector3>();
-        string[] lines = File.ReadAllLines(filePath);
 
-        foreach (string line in lines)
+        using (var conn = new NpgsqlConnection(connectionString))
         {
-            if (line.StartsWith("v")) // Строки вершин начинаются с "v"
+            conn.Open();
+            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM Vertices", conn))
+            using (var reader = cmd.ExecuteReader())
             {
-                string[] parts = line.Split(',');
-                float x = float.Parse(parts[1]);
-                float y = float.Parse(parts[2]);
-                float z = float.Parse(parts[3]);
-                vertices.Add(new Vector3(x, y, z));
+                while (reader.Read())
+                {
+                    float x = (float)reader.GetDouble(0);  // x_coord РёР· Р±Р°Р·С‹
+                    float y = 0;  // Р’С‹СЃРѕС‚Р° РѕСЃС‚Р°С‘С‚СЃСЏ 0
+                    float z = (float)reader.GetDouble(1);  // y_coord РёР· Р±Р°Р·С‹
+
+                    // РњРµРЅСЏРµРј РјРµСЃС‚Р°РјРё X Рё Z
+                    vertices.Add(new Vector3(x, y, z));
+                }
             }
         }
 
         return vertices;
     }
 
+
+
+
+
     public List<(int, int)> GetEdges()
     {
         List<(int, int)> edges = new List<(int, int)>();
-        string[] lines = File.ReadAllLines(filePath);
-
-        foreach (string line in lines)
+        using (var conn = new NpgsqlConnection(connectionString))
         {
-            if (line.StartsWith("e")) // Строки рёбер начинаются с "e"
+            conn.Open();
+            using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM Edges", conn))
+            using (var reader = cmd.ExecuteReader())
             {
-                string[] parts = line.Split(',');
-                int start = int.Parse(parts[1]);
-                int end = int.Parse(parts[2]);
-                edges.Add((start, end));
+                while (reader.Read())
+                {
+                    int start = reader.GetInt32(0) - 1;
+                    int end = reader.GetInt32(1) - 1;
+                    edges.Add((start, end));
+                }
             }
         }
-
         return edges;
     }
 }
 
-// Основной генератор карты
+// РћСЃРЅРѕРІРЅРѕР№ РіРµРЅРµСЂР°С‚РѕСЂ РєР°СЂС‚С‹
 public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject islandPrefab;
     [SerializeField] private GameObject roadPrefab;
     [SerializeField] private Transform mapParent;
-    private IDataReader dataReader; // Источник данных
+    private IDataReader dataReader;
 
     private List<Vector3> vertices = new List<Vector3>();
     private List<(int, int)> edges = new List<(int, int)>();
+    public void GenerateMapFromEditor()
+    {
+        LoadData();
+        GenerateMap();
+        Debug.Log("Map generated from editor!");
+    }
 
     void Start()
     {
-        // Используем mock-данные. Позже заменим на FileDataReader, когда файл будет готов.
-        dataReader = new MockDataReader();
-
-        // Загрузка данных
+        dataReader = new PostgresDataReader(); // РџРѕРґРєР»СЋС‡Р°РµРјСЃСЏ Рє Р‘Р”
         LoadData();
     }
 
@@ -109,13 +93,40 @@ public class MapGenerator : MonoBehaviour
         edges = dataReader.GetEdges();
 
         Debug.Log($"Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
+
+        foreach (var vertex in vertices)
+        {
+            Debug.Log($"Vertex: {vertex}");
+        }
+
+        foreach (var edge in edges)
+        {
+            Debug.Log($"Edge: {edge.Item1} -> {edge.Item2}");
+        }
     }
+
 
     private void GenerateMap()
     {
+        if (mapParent == null)
+        {
+            Debug.LogError("mapParent is not assigned! Assigning a new empty GameObject.");
+            mapParent = new GameObject("MapParent").transform;
+        }
+        if (vertices == null || vertices.Count == 0)
+        {
+            Debug.LogError("вќЊ РћС€РёР±РєР°: РЎРїРёСЃРѕРє vertices РїСѓСЃС‚! РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РґР°РЅРЅС‹Рµ Р·Р°РіСЂСѓР¶Р°СЋС‚СЃСЏ.");
+            return;
+        }
+
+        if (edges == null || edges.Count == 0)
+        {
+            Debug.LogWarning("вљ пёЏ РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ: РЎРїРёСЃРѕРє edges РїСѓСЃС‚! Р“СЂР°С„ РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµРїРѕР»РЅС‹Рј.");
+        }
+
         Debug.Log("GenerateMap called");
 
-        // Очистка текущей карты
+        // РћС‡РёСЃС‚РєР° С‚РµРєСѓС‰РµР№ РєР°СЂС‚С‹
         foreach (Transform child in mapParent)
         {
             Destroy(child.gameObject);
@@ -123,7 +134,7 @@ public class MapGenerator : MonoBehaviour
 
         Debug.Log("Children cleared");
 
-        // Создание островов
+        // РЎРѕР·РґР°РЅРёРµ РѕСЃС‚СЂРѕРІРѕРІ
         for (int i = 0; i < vertices.Count; i++)
         {
             GameObject island = Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent);
@@ -131,9 +142,17 @@ public class MapGenerator : MonoBehaviour
             Debug.Log($"Island {i} created at {vertices[i]}");
         }
 
-        // Создание дорог
+        // РЎРѕР·РґР°РЅРёРµ РґРѕСЂРѕРі
         foreach (var edge in edges)
         {
+            if (edge.Item1 < 0 || edge.Item1 >= vertices.Count || edge.Item2 < 0 || edge.Item2 >= vertices.Count)
+            {
+                Debug.LogError($"вќЊ РћС€РёР±РєР°: РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РёРЅРґРµРєСЃ СЂС‘Р±РµСЂ ({edge.Item1}, {edge.Item2})");
+                Debug.LogError("РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС€РёРЅ: ");
+                Debug.LogError(vertices.Count);
+                continue;
+            }
+
             Vector3 start = vertices[edge.Item1];
             Vector3 end = vertices[edge.Item2];
             Vector3 position = (start + end) / 2;
@@ -148,12 +167,6 @@ public class MapGenerator : MonoBehaviour
 
         Debug.Log("GenerateMap completed");
     }
-    public void GenerateMapFromEditor()
-    {
-        // Выполняем стандартную генерацию
-        LoadData();
-        GenerateMap();
-        Debug.Log("Map generated from editor!");
-    }
-}
 
+
+}
