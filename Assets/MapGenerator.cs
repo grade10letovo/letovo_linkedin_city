@@ -26,9 +26,11 @@ public class PostgresDataReader : IDataReader
             {
                 while (reader.Read())
                 {
-                    float x = (float)reader.GetDouble(0);
-                    float y = (float)reader.GetDouble(1);
-                    float z = 0; // Пусть Z остаётся 0, если его нет в БД
+                    float x = (float)reader.GetDouble(0);  // x_coord из базы
+                    float y = 0;  // Высота остаётся 0
+                    float z = (float)reader.GetDouble(1);  // y_coord из базы
+
+                    // Меняем местами X и Z
                     vertices.Add(new Vector3(x, y, z));
                 }
             }
@@ -36,6 +38,9 @@ public class PostgresDataReader : IDataReader
 
         return vertices;
     }
+
+
+
 
 
     public List<(int, int)> GetEdges()
