@@ -10,79 +10,41 @@ public interface IDataReader
     List<(int, int)> GetEdges();
 }
 
-// Реализация источника данных для PostgreSQL
-public class PostgresDataReader : IDataReader
-{
-    private string connectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
-
-    public List<Vector3> GetVertices()
-    {
-        List<Vector3> vertices = new List<Vector3>();
-
-        using (var conn = new NpgsqlConnection(connectionString))
-        {
-            conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM Vertices", conn))
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    float x = (float)reader.GetDouble(0);  // x_coord из базы
-                    float y = 0;  // Высота остаётся 0
-                    float z = (float)reader.GetDouble(1);  // y_coord из базы
-
-                    // Меняем местами X и Z
-                    vertices.Add(new Vector3(x, y, z));
-                }
-            }
-        }
-
-        return vertices;
-    }
-
-    public List<(int, int)> GetEdges()
-    {
-        List<(int, int)> edges = new List<(int, int)>();
-        using (var conn = new NpgsqlConnection(connectionString))
-        {
-            conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM Edges", conn))
-            using (var reader = cmd.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    int start = reader.GetInt32(0) - 1;
-                    int end = reader.GetInt32(1) - 1;
-                    edges.Add((start, end));
-                }
-            }
-        }
-        return edges;
-    }
-}
-
 // Основной генератор карты
 public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject islandPrefab;
     [SerializeField] private GameObject roadPrefab;
     private Transform mapParent;
-    private IDataReader dataReader;
+    private PostgresDataReader dataReader;
 
     private List<Vector3> vertices = new List<Vector3>();
     private List<(int, int)> edges = new List<(int, int)>();
+    private string connectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
     public void GenerateMapFromEditor()
     {
-        dataReader = new PostgresDataReader(); // Подключаемся к БД
-        LoadData();
+        dataReader = new PostgresDataReader(connectionString);
+        LoadData(); 
         GenerateMap();
         Debug.Log("Map generated from editor!");
+    }
+    public List<Vector3> GetVertices()
+    {
+        string query = "SELECT x_coord, y_coord FROM Vertices";
+        return dataReader.ExecuteQuery(query, reader =>
+            new Vector3((float)reader.GetDouble(0), 0, (float)reader.GetDouble(1)));
+    }
+
+    public List<(int, int)> GetEdges()
+    {
+        string query = "SELECT start_vertex_id, end_vertex_id FROM Edges";
+        return dataReader.ExecuteQuery(query, reader => (reader.GetInt32(0) - 1, reader.GetInt32(1) - 1));
     }
 
     private void LoadData()
     {
-        vertices = dataReader.GetVertices();
-        edges = dataReader.GetEdges();
+        vertices = GetVertices();
+        edges = GetEdges();
 
         Debug.Log($"Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
 
