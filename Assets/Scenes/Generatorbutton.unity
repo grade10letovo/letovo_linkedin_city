@@ -345,12 +345,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1365826698}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dc6762ea9efa434bb3c041b36f9f9ca, type: 3}
+  m_Script: {fileID: 11500000, guid: 18da374748fd4e84a8d0c6b08833e0bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 5278706993115044690, guid: 47bd8808adf994041b50712abee38275, type: 3}
-  roadPrefab: {fileID: 8953070253236969226, guid: e7122a30d13920e468c0bf80b74bb449, type: 3}
-  mapParent: {fileID: 1365826699}
+  islandPrefab: {fileID: 0}
+  roadPrefab: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
