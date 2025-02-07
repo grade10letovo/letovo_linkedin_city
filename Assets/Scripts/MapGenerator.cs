@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Npgsql;
+using Unity.VisualScripting;
 
 // Интерфейс для работы с источником данных
 public interface IDataReader
@@ -39,10 +40,6 @@ public class PostgresDataReader : IDataReader
         return vertices;
     }
 
-
-
-
-
     public List<(int, int)> GetEdges()
     {
         List<(int, int)> edges = new List<(int, int)>();
@@ -69,22 +66,17 @@ public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject islandPrefab;
     [SerializeField] private GameObject roadPrefab;
-    [SerializeField] private Transform mapParent;
+    private Transform mapParent;
     private IDataReader dataReader;
 
     private List<Vector3> vertices = new List<Vector3>();
     private List<(int, int)> edges = new List<(int, int)>();
     public void GenerateMapFromEditor()
     {
+        dataReader = new PostgresDataReader(); // Подключаемся к БД
         LoadData();
         GenerateMap();
         Debug.Log("Map generated from editor!");
-    }
-
-    void Start()
-    {
-        dataReader = new PostgresDataReader(); // Подключаемся к БД
-        LoadData();
     }
 
     private void LoadData()
@@ -105,9 +97,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-
     private void GenerateMap()
     {
+        mapParent = transform;
         if (mapParent == null)
         {
             Debug.LogError("mapParent is not assigned! Assigning a new empty GameObject.");
