@@ -917,11 +917,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: c7f7e135-80ee-44f8-8e96-f94c9fb4eff8
+  cloudProjectId: 1ab504b4-e637-4de1-aacd-554a4d7db7b3
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Project
-  organizationId: artemkul
+  projectName: gorod
+  organizationId: ilan6999
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
