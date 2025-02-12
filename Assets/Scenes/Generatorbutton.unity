@@ -219,13 +219,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 291793386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63849c047446bdb47ae5864321425c14, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ca82d2629843034eaf1c4b83a8a8304, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 5278706993115044690, guid: 47bd8808adf994041b50712abee38275, type: 3}
-  roadPrefab: {fileID: 8953070253236969226, guid: e7122a30d13920e468c0bf80b74bb449, type: 3}
+  islandPrefab: {fileID: 5278706993115044690, guid: f3fc4f2775f994a46969991141716125, type: 3}
+  roadPrefab: {fileID: 8953070253236969226, guid: 5f6b9078fca663549ae83ba419bd2092, type: 3}
   mapParent: {fileID: 1365826699}
-  cityGraphData: {fileID: 11400000, guid: 980455530f3f1234597ffe4272d85f7b, type: 2}
+  cityGraphData: {fileID: 11400000, guid: 3102e1d03f70c2c4b929cca2d72c2891, type: 2}
 --- !u!114 &291793388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -349,12 +349,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 540388126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2eaa67dafbb0757408caad5ab0af9094, type: 3}
+  m_Script: {fileID: 11500000, guid: 76cdc4a6203aa674f835a272f66cf30d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cityGraphData: {fileID: 11400000, guid: 980455530f3f1234597ffe4272d85f7b, type: 2}
-  islandPrefab: {fileID: 5278706993115044690, guid: 47bd8808adf994041b50712abee38275, type: 3}
-  roadPrefab: {fileID: 8953070253236969226, guid: e7122a30d13920e468c0bf80b74bb449, type: 3}
+  cityGraphData: {fileID: 11400000, guid: 3102e1d03f70c2c4b929cca2d72c2891, type: 2}
+  islandPrefab: {fileID: 5278706993115044690, guid: f3fc4f2775f994a46969991141716125, type: 3}
+  roadPrefab: {fileID: 8953070253236969226, guid: 5f6b9078fca663549ae83ba419bd2092, type: 3}
   mapParent: {fileID: 1365826699}
 --- !u!1 &1365826698
 GameObject:
@@ -387,20 +387,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1365826700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1365826698}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18da374748fd4e84a8d0c6b08833e0bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 0}
-  roadPrefab: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
