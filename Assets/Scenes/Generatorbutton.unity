@@ -387,8 +387,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-<<<<<<< HEAD
-=======
 --- !u!114 &1365826700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,7 +401,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   islandPrefab: {fileID: 0}
   roadPrefab: {fileID: 0}
->>>>>>> 638f927def976808913a97cfc9b3cacedb3e8e0d
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
