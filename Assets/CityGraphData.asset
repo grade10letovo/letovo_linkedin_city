@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c3f2ef0888870745b4daed1c9c969ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 6056781c97946b14599942ebc1c3f2eb, type: 3}
   m_Name: CityGraphData
   m_EditorClassIdentifier: 
   vertices:
