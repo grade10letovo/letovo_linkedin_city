@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3f2ef0888870745b4daed1c9c969ea, type: 3}
+  m_Name: CityGraphData
+  m_EditorClassIdentifier: 
+  vertices:
+  - {x: 1, y: 0, z: 2}
+  - {x: 3.5, y: 0, z: 4.2}
+  - {x: 6.7, y: 0, z: 1.8}
+  - {x: 10, y: 0, z: 15}
+  - {x: 6, y: 0, z: 30}
+  - {x: 8.2, y: 0, z: 1.5}
