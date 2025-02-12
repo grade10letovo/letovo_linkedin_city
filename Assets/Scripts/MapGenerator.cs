@@ -27,7 +27,7 @@ public class PostgresMapDataReader : IMapDataReader
                 while (reader.Read())
                 {
                     float x = (float)reader.GetDouble(0);
-                    float y = 0;
+                    float y = 0; // или какой-то другой уровень высоты, если нужно
                     float z = (float)reader.GetDouble(1);
                     vertices.Add(new Vector3(x, y, z));
                 }
@@ -47,8 +47,8 @@ public class PostgresMapDataReader : IMapDataReader
             {
                 while (reader.Read())
                 {
-                    int start = reader.GetInt32(0) - 1;
-                    int end = reader.GetInt32(1) - 1;
+                    int start = reader.GetInt32(0) - 1;  // корректируем индексы с 1 на 0
+                    int end = reader.GetInt32(1) - 1;    // корректируем индексы с 1 на 0
                     edges.Add((start, end));
                 }
             }
@@ -70,43 +70,41 @@ public class MapGenerator : MonoBehaviour
 
     public void GenerateMapFromEditor()
     {
+        dataReader = new PostgresMapDataReader(); // Используем правильный класс
         LoadData();
         GenerateMap();
         SaveGraphData();
         Debug.Log("Map generated from editor!");
     }
 
-    void Start()
-    {
-        dataReader = new PostgresMapDataReader();
-        LoadData();
-    }
-
     private void LoadData()
     {
         vertices = dataReader.GetVertexData();
         edges = dataReader.GetEdgeData();
-
         Debug.Log($"Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
     }
 
     private void GenerateMap()
     {
+        // Если mapParent не задан, создаем новый объект
         if (mapParent == null)
         {
             mapParent = new GameObject("MapParent").transform;
         }
 
+        // Удаляем все старые элементы
         foreach (Transform child in mapParent)
         {
             Destroy(child.gameObject);
         }
 
+        // Генерация островов (вершин)
         for (int i = 0; i < vertices.Count; i++)
         {
             Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent).name = $"Island {i}";
         }
 
+        // Генерация дорог (рёбер)
         foreach (var edge in edges)
         {
             if (edge.Item1 < 0 || edge.Item2 < 0 || edge.Item1 >= vertices.Count || edge.Item2 >= vertices.Count)
@@ -114,7 +112,6 @@ public class MapGenerator : MonoBehaviour
                 Debug.LogError($"Invalid edge: {edge.Item1} -> {edge.Item2}");
                 continue;
             }
-
             CreateRoad(vertices[edge.Item1], vertices[edge.Item2]);
         }
     }
@@ -124,8 +121,9 @@ public class MapGenerator : MonoBehaviour
         if (roadPrefab == null)
         {
             Debug.LogWarning("Road prefab is missing!!");
-
+            return; // Выход из метода, если префаб дороги отсутствует
         }
+
         GameObject road = Instantiate(roadPrefab, mapParent);
         road.transform.position = (start + end) / 2f;
         road.transform.rotation = Quaternion.LookRotation(end - start);
