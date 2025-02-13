@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 6382513768004535261}
   - component: {fileID: 4234225119548621586}
   - component: {fileID: 3754492799430878138}
-  - component: {fileID: 4094700917069134609}
-  - component: {fileID: -2713927144966090085}
+  - component: {fileID: -6040891434746294880}
   m_Layer: 0
   m_Name: Road_prefab
   m_TagString: Untagged
@@ -85,8 +84,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &4094700917069134609
-CapsuleCollider:
+--- !u!65 &-6040891434746294880
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -103,23 +102,6 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &-2713927144966090085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8953070253236969226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51244a621b43d764fb426c63b7efbbf1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 0}
-  roadPrefab: {fileID: 0}
-  mapParent: {fileID: 0}
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
