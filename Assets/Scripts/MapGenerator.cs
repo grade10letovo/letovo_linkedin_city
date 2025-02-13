@@ -1,25 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Npgsql;
-using Unity.VisualScripting;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-// Интерфейс для работы с источником данных
-public interface IDataReader
+public interface IMapDataReader
 {
-    List<Vector3> GetVertices();
-    List<(int, int)> GetEdges();
+    List<Vector3> GetVertexData();
+    List<(int, int)> GetEdgeData();
 }
 
-// Реализация источника данных для PostgreSQL
-public class PostgresDataReader : IDataReader
+public class PostgresMapDataReader : IMapDataReader
 {
-    private string connectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
+    private const string ConnectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
 
-    public List<Vector3> GetVertices()
+    public List<Vector3> GetVertexData()
     {
         List<Vector3> vertices = new List<Vector3>();
-
-        using (var conn = new NpgsqlConnection(connectionString))
+        using (var conn = new NpgsqlConnection(ConnectionString))
         {
             conn.Open();
             using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM Vertices", conn))
@@ -27,23 +26,20 @@ public class PostgresDataReader : IDataReader
             {
                 while (reader.Read())
                 {
-                    float x = (float)reader.GetDouble(0);  // x_coord из базы
-                    float y = 0;  // Высота остаётся 0
-                    float z = (float)reader.GetDouble(1);  // y_coord из базы
-
-                    // Меняем местами X и Z
+                    float x = (float)reader.GetDouble(0);
+                    float y = 0; // или какой-то другой уровень высоты, если нужно
+                    float z = (float)reader.GetDouble(1);
                     vertices.Add(new Vector3(x, y, z));
                 }
             }
         }
-
         return vertices;
     }
 
-    public List<(int, int)> GetEdges()
+    public List<(int, int)> GetEdgeData()
     {
         List<(int, int)> edges = new List<(int, int)>();
-        using (var conn = new NpgsqlConnection(connectionString))
+        using (var conn = new NpgsqlConnection(ConnectionString))
         {
             conn.Open();
             using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM Edges", conn))
@@ -51,8 +47,8 @@ public class PostgresDataReader : IDataReader
             {
                 while (reader.Read())
                 {
-                    int start = reader.GetInt32(0) - 1;
-                    int end = reader.GetInt32(1) - 1;
+                    int start = reader.GetInt32(0) - 1;  // корректируем индексы с 1 на 0
+                    int end = reader.GetInt32(1) - 1;    // корректируем индексы с 1 на 0
                     edges.Add((start, end));
                 }
             }
@@ -61,104 +57,89 @@ public class PostgresDataReader : IDataReader
     }
 }
 
-// Основной генератор карты
 public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject islandPrefab;
     [SerializeField] private GameObject roadPrefab;
-    private Transform mapParent;
-    private IDataReader dataReader;
+    [SerializeField] private Transform mapParent;
+    [SerializeField] private CityGraphData cityGraphData;
 
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<(int, int)> edges = new List<(int, int)>();
+    private IMapDataReader dataReader;
+    private List<Vector3> vertices;
+    private List<(int, int)> edges;
+
     public void GenerateMapFromEditor()
     {
-        dataReader = new PostgresDataReader(); // Подключаемся к БД
+        dataReader = new PostgresMapDataReader(); // Используем правильный класс
         LoadData();
         GenerateMap();
+        SaveGraphData();
         Debug.Log("Map generated from editor!");
     }
 
     private void LoadData()
     {
-        vertices = dataReader.GetVertices();
-        edges = dataReader.GetEdges();
-
+        vertices = dataReader.GetVertexData();
+        edges = dataReader.GetEdgeData();
         Debug.Log($"Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
-
-        foreach (var vertex in vertices)
-        {
-            Debug.Log($"Vertex: {vertex}");
-        }
-
-        foreach (var edge in edges)
-        {
-            Debug.Log($"Edge: {edge.Item1} -> {edge.Item2}");
-        }
     }
 
     private void GenerateMap()
     {
-        mapParent = transform;
+        // Если mapParent не задан, создаем новый объект
         if (mapParent == null)
         {
-            Debug.LogError("mapParent is not assigned! Assigning a new empty GameObject.");
             mapParent = new GameObject("MapParent").transform;
         }
-        if (vertices == null || vertices.Count == 0)
-        {
-            Debug.LogError("❌ Ошибка: Список vertices пуст! Убедитесь, что данные загружаются.");
-            return;
-        }
 
-        if (edges == null || edges.Count == 0)
-        {
-            Debug.LogWarning("⚠️ Предупреждение: Список edges пуст! Граф может быть неполным.");
-        }
-
-        Debug.Log("GenerateMap called");
-
-        // Очистка текущей карты
+        // Удаляем все старые элементы
         foreach (Transform child in mapParent)
         {
             Destroy(child.gameObject);
         }
 
-        Debug.Log("Children cleared");
-
-        // Создание островов
+        // Генерация островов (вершин)
         for (int i = 0; i < vertices.Count; i++)
         {
-            GameObject island = Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent);
-            island.name = $"Island {i}";
-            Debug.Log($"Island {i} created at {vertices[i]}");
+            Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent).name = $"Island {i}";
         }
 
-        // Создание дорог
+        // Генерация дорог (рёбер)
         foreach (var edge in edges)
         {
-            if (edge.Item1 < 0 || edge.Item1 >= vertices.Count || edge.Item2 < 0 || edge.Item2 >= vertices.Count)
+            if (edge.Item1 < 0 || edge.Item2 < 0 || edge.Item1 >= vertices.Count || edge.Item2 >= vertices.Count)
             {
-                Debug.LogError($"❌ Ошибка: Некорректный индекс рёбер ({edge.Item1}, {edge.Item2})");
-                Debug.LogError("Количество вершин: ");
-                Debug.LogError(vertices.Count);
+                Debug.LogError($"Invalid edge: {edge.Item1} -> {edge.Item2}");
                 continue;
             }
-
-            Vector3 start = vertices[edge.Item1];
-            Vector3 end = vertices[edge.Item2];
-            Vector3 position = (start + end) / 2;
-            Vector3 direction = end - start;
-
-            GameObject road = Instantiate(roadPrefab, position, Quaternion.identity, mapParent);
-            road.transform.rotation = Quaternion.LookRotation(direction);
-            road.transform.localScale = new Vector3(0.2f, 0.2f, direction.magnitude);
-
-            Debug.Log($"Road created between {start} and {end}");
+            CreateRoad(vertices[edge.Item1], vertices[edge.Item2]);
         }
-
-        Debug.Log("GenerateMap completed");
     }
 
+    private void CreateRoad(Vector3 start, Vector3 end)
+    {
+        if (roadPrefab == null)
+        {
+            Debug.LogWarning("Road prefab is missing!!");
+            return; // Выход из метода, если префаб дороги отсутствует
+        }
 
+        GameObject road = Instantiate(roadPrefab, mapParent);
+        road.transform.position = (start + end) / 2f;
+        road.transform.rotation = Quaternion.LookRotation(end - start);
+        road.transform.localScale = new Vector3(0.2f, 0.2f, (end - start).magnitude);
+    }
+
+    private void SaveGraphData()
+    {
+        if (cityGraphData)
+        {
+            cityGraphData.SetData(vertices, edges);
+            Debug.Log("Graph data saved!");
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(cityGraphData);
+            AssetDatabase.SaveAssets();
+#endif
+        }
+    }
 }
