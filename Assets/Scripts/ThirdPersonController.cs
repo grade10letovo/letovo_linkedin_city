@@ -7,15 +7,22 @@ public class ThirdPersonController : MonoBehaviour
     public Text modeText;
     public CharacterController characterController;
     public Animator animator;
+
     public float walkSpeed = 2f;
     public float runSpeed = 4f;
     public float sprintSpeed = 6f;
+    public float acceleration = 4f;  // Как быстро набираем скорость
+    public float deceleration = 6f;  // Как быстро тормозим
     public float jumpHeight = 2f;
     public float gravity = -9.81f;
 
     [Header("Audio Settings")]
     public AudioSource footstepSource;
-    public AudioClip footstepSounds;
+    public AudioClip footstepSound;
+    public float footstepIntervalWalk = 0.6f;
+    public float footstepIntervalRun = 0.4f;
+    public float footstepIntervalSprint = 0.3f;
+
     public AudioSource jumpSource;
     public AudioClip jumpSound;
     public AudioSource landSource;
@@ -27,7 +34,9 @@ public class ThirdPersonController : MonoBehaviour
     private bool isGrounded;
     private bool wasGroundedLastFrame;
     private bool isJumping;
-    private float currentSpeed;
+    private float targetSpeed;
+    private float currentSpeed = 0f;
+    private float footstepTimer = 0f;
 
     private void Awake()
     {
@@ -45,15 +54,14 @@ public class ThirdPersonController : MonoBehaviour
     {
         inputActions.Disable();
     }
+
     private bool IsFacingWall()
     {
         RaycastHit hit;
-        Vector3 rayStart = transform.position + Vector3.up * 0.5f; // Сдвигаем начало вверх
-        float rayDistance = 0.6f; // Чуть больше, чем радиус коллайдера
+        Vector3 rayStart = transform.position + Vector3.up * 0.5f;
+        float rayDistance = 0.6f;
         return Physics.Raycast(rayStart, transform.forward, out hit, rayDistance);
     }
-
-
 
     private void Update()
     {
@@ -83,42 +91,67 @@ public class ThirdPersonController : MonoBehaviour
             }
         }
 
-        // 🔹 Определяем скорость передвижения
+        // 🔹 Определяем целевую скорость
         if (moveInput.magnitude > 0.001f && isGrounded)
         {
             if (inputActions.Player.Sprint.IsPressed() && !IsFacingWall())
             {
                 modeText.text = "Спринт";
-                currentSpeed = sprintSpeed;
+                targetSpeed = sprintSpeed;
             }
             else if (inputActions.Player.Run.IsPressed())
             {
                 modeText.text = "Бег";
-                currentSpeed = runSpeed;
+                targetSpeed = runSpeed;
             }
             else
             {
                 modeText.text = "Ходьба";
-                currentSpeed = walkSpeed;
-            }
-
-            // 🔊 Запускаем звук шагов, если персонаж двигается
-            if (!footstepSource.isPlaying && landSource != null)
-            {
-                footstepSource.PlayOneShot(footstepSounds);
+                targetSpeed = walkSpeed;
             }
         }
         else
         {
             modeText.text = "Остановка";
-            currentSpeed = 0;
+            targetSpeed = 0;
+        }
+
+        // 🎯 Плавное изменение скорости
+        if (currentSpeed < targetSpeed)
+        {
+            currentSpeed += acceleration * Time.deltaTime;
+            if (currentSpeed > targetSpeed) currentSpeed = targetSpeed;
+        }
+        else if (currentSpeed > targetSpeed)
+        {
+            currentSpeed -= deceleration * Time.deltaTime;
+            if (currentSpeed < 0) currentSpeed = 0;
         }
 
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         characterController.Move(move * currentSpeed * Time.deltaTime);
 
-        // 🔹 Передаём скорость в Blend Tree
+        // 🔹 Передаём скорость в Blend Tree (увеличивает скорость анимации)
         animator.SetFloat("Speed", currentSpeed);
+
+        // 🔊 Управление звуками шагов
+        if (isGrounded && moveInput.magnitude > 0.1f)
+        {
+            footstepTimer -= Time.deltaTime;
+
+            float stepInterval = footstepIntervalWalk;
+            if (currentSpeed > walkSpeed) stepInterval = footstepIntervalRun;
+            if (currentSpeed > runSpeed) stepInterval = footstepIntervalSprint;
+
+            if (footstepTimer <= 0f)
+            {
+                if (footstepSound != null)
+                {
+                    footstepSource.PlayOneShot(footstepSound);
+                }
+                footstepTimer = stepInterval;
+            }
+        }
 
         // 🔥 Улучшенная логика прыжка
         if (inputActions.Player.Jump.triggered && isGrounded && !isJumping)
