@@ -1,42 +1,58 @@
-using UnityEngine;
-using UnityEngine.InputSystem;
+﻿using UnityEngine;
 using Cinemachine;
 
-public class ThirdPersonCamera : MonoBehaviour
+public class CameraFollowHead : MonoBehaviour
 {
-    public CinemachineFreeLook freeLookCamera; // ������ ���� �������� � Inspector
-    public float sensitivityX = 1.5f;
-    public float sensitivityY = 1.5f;
+    public CinemachineFreeLook freeLookCamera; // Камера
+    public Transform targetObject;  // Объект (голова персонажа), за которым будет следить камера
+    public float sensitivity = 2f;  // Чувствительность мыши
+    public bool invertYAxis = false;  // Инвертировать ли ось Y
 
-    private PlayerInputActions inputActions;
-    private Vector2 lookInput;
+    public Vector3 defaultCameraOffset;  // Смещение камеры относительно объекта (головы)
+    private Vector3 targetOffset;  // Смещение камеры, которое можно изменять
 
-    private void Awake()
+    private void Start()
     {
-        inputActions = new PlayerInputActions();
+        // Устанавливаем начальное смещение камеры с учётом головы
+        defaultCameraOffset = new Vector3(0f, 1.6f, -4f); // Можно настроить в зависимости от высоты головы
+        targetOffset = defaultCameraOffset;
+
+        // Устанавливаем начальное положение камеры относительно головы
+        freeLookCamera.transform.position = targetObject.position + targetOffset;
     }
 
-    private void OnEnable()
+    void Update()
     {
-        inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;
-        inputActions.Enable();
+        // Получаем данные от мыши для вращения камеры
+        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * sensitivity * (invertYAxis ? 1 : -1);
+
+        // Вращаем камеру по осям X и Y
+        freeLookCamera.m_XAxis.Value += mouseX;
+        freeLookCamera.m_YAxis.Value = Mathf.Clamp(
+            freeLookCamera.m_YAxis.Value + mouseY * 0.01f,
+            0.1f,  // Минимальный угол наклона
+            0.9f   // Максимальный угол наклона
+        );
+
+        // Обновляем позицию камеры относительно цели
+        Vector3 desiredPosition = targetObject.position + targetOffset;
+        freeLookCamera.transform.position = desiredPosition;
+
+        // Обновляем углы наклона камеры, чтобы всегда была видна голова
+        UpdateCameraTilt();
     }
 
-    private void OnDisable()
+    void UpdateCameraTilt()
     {
-        inputActions.Disable();
-    }
-
-    private void Update()
-    {
-        if (freeLookCamera == null)
+        // Если камера слишком низко и теряет голову, наклоняем её вверх
+        if (freeLookCamera.m_YAxis.Value < 0.3f)
         {
-            Debug.LogError("CinemachineFreeLook �� �������� � Inspector!");
-            return;
+            freeLookCamera.m_YAxis.Value = Mathf.Lerp(
+                freeLookCamera.m_YAxis.Value,
+                0.5f, // Угол наклона камеры (можно настроить)
+                Time.deltaTime * 2f
+            );
         }
-
-        freeLookCamera.m_XAxis.m_InputAxisValue = lookInput.x * sensitivityX;
-        freeLookCamera.m_YAxis.m_InputAxisValue = lookInput.y * sensitivityY;
     }
 }
