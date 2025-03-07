@@ -1,4 +1,0 @@
-repository "gorod@ilan6999@cloud"
-  path "/"
-    br "/main"
-    co "/main"
