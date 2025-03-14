@@ -23,6 +23,10 @@ public class CityGraphData : ScriptableObject
     public void SetData(List<Vector3> newVertices, List<(int, int)> newEdges)
     {
         vertices = new List<Vector3>(newVertices);
-        //edges = new List<Vector2Int>(newEdges);
+        edges = new List<Vector2Int>();
+        foreach (var edge in newEdges)
+        {
+            edges.Add(new Vector2Int(edge.Item1, edge.Item2));
+        }
     }
 }
