@@ -228,8 +228,9 @@ $RECYCLE.BIN/
 # Игнорировать все .meta файлы
 *.meta
 
-# Но не игнорировать .meta файлы в папке Assets/Scenes/
-!Assets/Scenes/*.meta
+# Но не игнорировать .meta файлы в корне папки Assets/
+!Assets/*.meta
+
 
 
 # End of https://www.toptal.com/developers/gitignore/api/unity,rider,macos,windows,linux
