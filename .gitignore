@@ -225,11 +225,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# Ignore all .meta files
-*.meta
+# NOT Ignore all .meta files
+# *.meta
 
 # But do NOT ignore .meta files in the Assets/Scenes directory
-!Assets/Scenes/*.meta
+# !Assets/Scenes/*.meta
 
 
 # End of https://www.toptal.com/developers/gitignore/api/unity,rider,macos,windows,linux
