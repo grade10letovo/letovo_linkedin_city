@@ -9,13 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6056781c97946b14599942ebc1c3f2eb, type: 3}
+  m_Script: {fileID: 11500000, guid: 172afb45663104842b0ff17d014f6baa, type: 3}
   m_Name: CityGraphData
   m_EditorClassIdentifier: 
   vertices:
-  - {x: 1, y: 0, z: 2}
-  - {x: 3.5, y: 0, z: 4.2}
-  - {x: 6.7, y: 0, z: 1.8}
-  - {x: 10, y: 0, z: 15}
-  - {x: 6, y: 0, z: 30}
-  - {x: 8.2, y: 0, z: 1.5}
+  - {x: 2090, y: -2, z: 1400}
+  - {x: -359, y: -2, z: -100}
+  - {x: 0, y: -2, z: -500}
+  - {x: -1000, y: -2, z: -400}
+  edges:
+  - {x: 1, y: 2}
+  - {x: 1, y: 3}
+  - {x: 1, y: 0}

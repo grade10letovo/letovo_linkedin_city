@@ -65,13 +65,55 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
-        isGrounded = characterController.isGrounded;
+            // Определяем начальную точку SphereCast
+            Vector3 origin = transform.position + Vector3.up * (characterController.height / 2 - characterController.radius);
 
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
+            // Радиус сферы для SphereCast
+            float sphereRadius = characterController.radius * 0.9f; // Немного меньше радиуса CharacterController
 
+            // Вычисляем максимальную длину SphereCast
+            float distance = characterController.radius + 0.1f;
+
+            // Проверяем контакт с поверхностью через SphereCast
+            if (Physics.SphereCast(origin, sphereRadius, Vector3.down, out RaycastHit hit, distance))
+            {
+                isGrounded = true;
+            }
+            else
+            {
+                isGrounded = false;
+            }
+
+            // Визуализация сферы (только в режиме Play)
+            Debug.DrawRay(origin, Vector3.down * distance, isGrounded ? Color.green : Color.red);
+            Debug.DrawRay(origin + Vector3.down * distance, Vector3.up * distance, isGrounded ? Color.green : Color.red);
+
+            // Визуализация границ сферы
+            Debug.DrawLine(
+                origin + new Vector3(sphereRadius, 0, 0),
+                origin + new Vector3(sphereRadius, -distance, 0),
+                isGrounded ? Color.green : Color.red
+            );
+            Debug.DrawLine(
+                origin + new Vector3(-sphereRadius, 0, 0),
+                origin + new Vector3(-sphereRadius, -distance, 0),
+                isGrounded ? Color.green : Color.red
+            );
+            Debug.DrawLine(
+                origin + new Vector3(0, 0, sphereRadius),
+                origin + new Vector3(0, -distance, sphereRadius),
+                isGrounded ? Color.green : Color.red
+            );
+            Debug.DrawLine(
+                origin + new Vector3(0, 0, -sphereRadius),
+                origin + new Vector3(0, -distance, -sphereRadius),
+                isGrounded ? Color.green : Color.red
+            );
+        Debug.Log(velocity.y);
+    if (isGrounded && velocity.y < 0)
+    {
+        velocity.y = -2f;
+    }
         // 🔹 Обрабатываем анимации приземления и падения
         if (!isGrounded && velocity.y < -0.5f)
         {

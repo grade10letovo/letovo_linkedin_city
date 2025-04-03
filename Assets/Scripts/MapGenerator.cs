@@ -13,7 +13,7 @@ public interface IMapDataReader
 
 public class PostgresMapDataReader : IMapDataReader
 {
-    private const string ConnectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
+    private const string ConnectionString = "Host=localhost;Username=postgres;Password=0000;Database=city";
 
     public List<Vector3> GetVertexData()
     {
@@ -21,7 +21,7 @@ public class PostgresMapDataReader : IMapDataReader
         using (var conn = new NpgsqlConnection(ConnectionString))
         {
             conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM Vertices", conn))
+            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM vertices", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -42,7 +42,7 @@ public class PostgresMapDataReader : IMapDataReader
         using (var conn = new NpgsqlConnection(ConnectionString))
         {
             conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM Edges", conn))
+            using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM edges", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
