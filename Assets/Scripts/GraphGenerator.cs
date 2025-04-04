@@ -42,6 +42,8 @@ public class GraphGenerator : MonoBehaviour
         GameObject road = Instantiate(roadPrefab, mapParent);
         road.transform.position = (start + end) / 2f;
         road.transform.rotation = Quaternion.LookRotation(end - start);
-        road.transform.localScale = new Vector3(0.2f, 0.2f, (end - start).magnitude);
+        road.transform.rotation = Quaternion.Euler(road.transform.eulerAngles + new Vector3(0, 45, 0));
+        Debug.Log(islandPrefab.transform.Find("land autumn atmosphere forest").GetComponent<BoxCollider>().size);
+        road.transform.localScale = new Vector3(road.transform.localScale.x, road.transform.localScale.y, (end - start + islandPrefab.transform.Find("land autumn atmosphere forest").GetComponent<BoxCollider>().size).magnitude);
     }
 }
