@@ -9953,13 +9953,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 540388126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e03e9d0f540fb24fa75e6909f36cbd7, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ca82d2629843034eaf1c4b83a8a8304, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cityGraphData: {fileID: 11400000, guid: fdd349aa8ac7ccc43903f157f0ea7848, type: 2}
   islandPrefab: {fileID: 4245952273932977870, guid: fe9cb1b9b4e174249a889ab3e78e65e0, type: 3}
-  roadPrefab: {fileID: 8953070253236969226, guid: 68c02888d1c2d7e4eaeb95767e2851cc, type: 3}
-  mapParent: {fileID: 1365826699}
+  roadPrefab: {fileID: 0}
+  mapParent: {fileID: 0}
+  cityGraphData: {fileID: 0}
 --- !u!1 &543206346
 GameObject:
   m_ObjectHideFlags: 0
