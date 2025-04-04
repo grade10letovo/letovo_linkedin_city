@@ -13,25 +13,33 @@ public interface IMapDataReader
 
 public class PostgresMapDataReader : IMapDataReader
 {
-    private const string ConnectionString = "Host=localhost;Username=postgres;Password=0000;Database=city";
+    private const string ConnectionString = "Host=localhost;Username=postgres;Password=code1234;Database=city";
 
     public List<Vector3> GetVertexData()
     {
         List<Vector3> vertices = new List<Vector3>();
-        using (var conn = new NpgsqlConnection(ConnectionString))
+        try
         {
-            conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM vertices", conn))
-            using (var reader = cmd.ExecuteReader())
+            using (var conn = new NpgsqlConnection(ConnectionString))
             {
-                while (reader.Read())
+                conn.Open();
+                using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM vertices", conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    float x = (float)reader.GetDouble(0);
-                    float y = 0; // или какой-то другой уровень высоты, если нужно
-                    float z = (float)reader.GetDouble(1);
-                    vertices.Add(new Vector3(x, y, z));
+                    while (reader.Read())
+                    {
+                        float x = (float)reader.GetDouble(0);
+                        float y = 0;
+                        float z = (float)reader.GetDouble(1);
+                        vertices.Add(new Vector3(x, y, z));
+                    }
                 }
+                Debug.Log($"✅ Loaded {vertices.Count} vertices from database.");
             }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("❌ Error loading vertices from database: " + ex.Message);
         }
         return vertices;
     }
@@ -39,19 +47,27 @@ public class PostgresMapDataReader : IMapDataReader
     public List<(int, int)> GetEdgeData()
     {
         List<(int, int)> edges = new List<(int, int)>();
-        using (var conn = new NpgsqlConnection(ConnectionString))
+        try
         {
-            conn.Open();
-            using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM edges", conn))
-            using (var reader = cmd.ExecuteReader())
+            using (var conn = new NpgsqlConnection(ConnectionString))
             {
-                while (reader.Read())
+                conn.Open();
+                using (var cmd = new NpgsqlCommand("SELECT start_vertex_id, end_vertex_id FROM edges", conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    int start = reader.GetInt32(0) - 1;  // корректируем индексы с 1 на 0
-                    int end = reader.GetInt32(1) - 1;    // корректируем индексы с 1 на 0
-                    edges.Add((start, end));
+                    while (reader.Read())
+                    {
+                        int start = reader.GetInt32(0) - 1;
+                        int end = reader.GetInt32(1) - 1;
+                        edges.Add((start, end));
+                    }
                 }
+                Debug.Log($"✅ Loaded {edges.Count} edges from database.");
             }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("❌ Error loading edges from database: " + ex.Message);
         }
         return edges;
     }
@@ -70,58 +86,63 @@ public class MapGenerator : MonoBehaviour
 
     public void GenerateMapFromEditor()
     {
-        dataReader = new PostgresMapDataReader(); // Используем правильный класс
-        LoadData();
-        GenerateMap();
-        SaveGraphData();
-        Debug.Log("Map generated from editor!");
+        try
+        {
+            dataReader = new PostgresMapDataReader();
+            LoadData();
+            GenerateMap();
+            SaveGraphData();
+            Debug.Log("✅ Map generated from editor!");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("❌ Error generating map: " + ex.Message);
+        }
     }
 
     private void LoadData()
     {
         vertices = dataReader.GetVertexData();
         edges = dataReader.GetEdgeData();
-        Debug.Log($"Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
+        Debug.Log($"📦 Loaded Vertices: {vertices.Count}, Edges: {edges.Count}");
     }
 
     private void GenerateMap()
     {
-        // Если mapParent не задан, создаем новый объект
         if (mapParent == null)
         {
             mapParent = new GameObject("MapParent").transform;
         }
 
-        // Удаляем все старые элементы
         foreach (Transform child in mapParent)
         {
             Destroy(child.gameObject);
         }
 
-        // Генерация островов (вершин)
         for (int i = 0; i < vertices.Count; i++)
         {
             Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent).name = $"Island {i}";
         }
 
-        // Генерация дорог (рёбер)
         foreach (var edge in edges)
         {
             if (edge.Item1 < 0 || edge.Item2 < 0 || edge.Item1 >= vertices.Count || edge.Item2 >= vertices.Count)
             {
-                Debug.LogError($"Invalid edge: {edge.Item1} -> {edge.Item2}");
+                Debug.LogError($"❗ Invalid edge: {edge.Item1} -> {edge.Item2}");
                 continue;
             }
             CreateRoad(vertices[edge.Item1], vertices[edge.Item2]);
         }
+
+        Debug.Log("🗺️ Map generation complete.");
     }
 
     private void CreateRoad(Vector3 start, Vector3 end)
     {
         if (roadPrefab == null)
         {
-            Debug.LogWarning("Road prefab is missing!!");
-            return; // Выход из метода, если префаб дороги отсутствует
+            Debug.LogWarning("⚠️ Road prefab is missing!");
+            return;
         }
 
         GameObject road = Instantiate(roadPrefab, mapParent);
@@ -135,7 +156,7 @@ public class MapGenerator : MonoBehaviour
         if (cityGraphData)
         {
             cityGraphData.SetData(vertices, edges);
-            Debug.Log("Graph data saved!");
+            Debug.Log("💾 Graph data saved to CityGraphData asset.");
 #if UNITY_EDITOR
             EditorUtility.SetDirty(cityGraphData);
             AssetDatabase.SaveAssets();
