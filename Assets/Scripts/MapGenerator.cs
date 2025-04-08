@@ -75,7 +75,8 @@ public class PostgresMapDataReader : IMapDataReader
 
 public class MapGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject islandPrefab;
+    [Header("Terrain Generator Reference")]
+    [SerializeField] private TerrainGenerator terrainGenerator;
     [SerializeField] private GameObject roadPrefab;
     [SerializeField] private Transform mapParent;
     [SerializeField] private CityGraphData cityGraphData;
@@ -113,15 +114,28 @@ public class MapGenerator : MonoBehaviour
         {
             mapParent = new GameObject("MapParent").transform;
         }
-
-        foreach (Transform child in mapParent)
+        for (int i = mapParent.transform.childCount - 1; i >= 0; i--)
         {
-            Destroy(child.gameObject);
+            DestroyImmediate(mapParent.transform.GetChild(i).gameObject);
         }
 
         for (int i = 0; i < vertices.Count; i++)
         {
-            Instantiate(islandPrefab, vertices[i], Quaternion.identity, mapParent).name = $"Island {i}";
+            // Генерируем террейн с помощью TerrainGenerator вместо префабов островов
+            if (terrainGenerator != null)
+            {
+                GameObject terrainObj = terrainGenerator.GenerateTerrain();
+                if (terrainObj != null && mapParent != null)
+                {
+                    terrainObj.transform.SetParent(mapParent, true);
+                }
+                terrainObj.name = $"Island {i}";
+                terrainObj.transform.position = vertices[i];
+            }
+            else
+            {
+                Debug.LogError("TerrainGenerator is not assigned!");
+            }
         }
 
         foreach (var edge in edges)

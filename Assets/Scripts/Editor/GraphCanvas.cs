@@ -6,22 +6,24 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class GraphCanvas : GraphView
 {
+    private const float gridSpacing = 20f;
+
     public GraphCanvas()
     {
-        // Устанавливаем размеры и стиль канваса
         this.StretchToParentSize();
         this.style.backgroundColor = new StyleColor(Color.gray);
 
-        // Добавляем поддержку перетаскивания и зума
         this.SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
         this.AddManipulator(new RectangleSelector());
-        // Добавляем стили для рёбер
         this.AddManipulator(new EdgeManipulator());
-        // Настраиваем события для соединения и отсоединения рёбер
+
+        Insert(0, new GridBackground());
+
         graphViewChanged = OnGraphViewChanged;
     }
+
     private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
     {
         if (graphViewChange.edgesToCreate != null)
@@ -32,28 +34,36 @@ public class GraphCanvas : GraphView
             }
         }
 
+        if (graphViewChange.movedElements != null)
+        {
+            foreach (var element in graphViewChange.movedElements)
+            {
+                if (element is GraphNode node)
+                {
+                    SnapNodeToGrid(node);
+                }
+            }
+        }
+
         return graphViewChange;
     }
+
+    private void SnapNodeToGrid(GraphNode node)
+    {
+        float x = Mathf.Round(node.GetPosition().x / gridSpacing) * gridSpacing;
+        float y = Mathf.Round(node.GetPosition().y / gridSpacing) * gridSpacing;
+        node.SetPosition(new Rect(new Vector2(x, y), node.GetPosition().size));
+    }
+
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
     {
         List<Port> connectionList = new List<Port>();
         ports.ForEach(port =>
         {
-            if (port == startPort)
-            {
+            if (port == startPort || port.node == startPort.node || port.direction == startPort.direction)
                 return;
-            }
-            if (port.node == startPort.node)
-            {
-                return;
-            }
-            if (port.direction == startPort.direction)
-            {
-                return;
-            }
             connectionList.Add(port);
         });
         return connectionList;
     }
-
 }
