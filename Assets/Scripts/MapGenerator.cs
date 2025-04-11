@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Npgsql;
+using UnityEngine.TerrainUtils;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -81,6 +83,14 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Transform mapParent;
     [SerializeField] private CityGraphData cityGraphData;
 
+    [Header("Flat Generator")]
+    [SerializeField] private int numberOfFlats;
+    [SerializeField] private Vector2 minSize;
+    [SerializeField] private Vector2 maxSize;
+
+    [Header("University Generator")]
+    [SerializeField] private GameObject universityPrefab;
+
     private IMapDataReader dataReader;
     private List<Vector3> vertices;
     private List<(int, int)> edges;
@@ -131,6 +141,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 terrainObj.name = $"Island {i}";
                 terrainObj.transform.position = vertices[i];
+                GenerateRandomPlatforms(terrainObj.GetComponent<Terrain>(), 5, new Vector2(10, 10), new Vector2(100, 100));
             }
             else
             {
@@ -149,6 +160,90 @@ public class MapGenerator : MonoBehaviour
         }
 
         Debug.Log("🗺️ Map generation complete.");
+    }
+    /// <summary>
+    /// Генерирует случайное размещение площадок на террейне.
+    /// </summary>
+    /// <param name="terrain">Объект Terrain, на котором будут создаваться площадки.</param>
+    /// <param name="platformCount">Желаемое количество площадок.</param>
+    /// <param name="minPlatformSize">Минимальный размер площадки (ширина по оси X и длина по оси Z).</param>
+    /// <param name="maxPlatformSize">Максимальный размер площадки (ширина по оси X и длина по оси Z).</param>
+    /// <param name="smoothingRadius">Радиус (в точках heightmap) для сглаживания перехода между площадкой и окружающим террейном.</param>
+    /// <param name="maxAttempts">Максимальное число попыток для расстановки (чтобы избежать бесконечного цикла, если площадки не могут быть расставлены без пересечений).</param>
+    public static void GenerateRandomPlatforms(Terrain terrain, int platformCount, Vector2 minPlatformSize, Vector2 maxPlatformSize, int smoothingRadius = 5, int maxAttempts = 100)
+    {
+        TerrainData terrainData = terrain.terrainData;
+        Vector3 terrainPos = terrain.transform.position;
+        float terrainWidth = terrainData.size.x;
+        float terrainLength = terrainData.size.z;
+
+        // Для хранения уже расставленных площадок (в мировых координатах)
+        List<Rect> placedPlatforms = new List<Rect>();
+
+        int createdPlatforms = 0;
+        int attempts = 0;
+
+        // Пока не создано нужное число площадок или пока не превышены максимум попыток
+        while (createdPlatforms < platformCount && attempts < maxAttempts)
+        {
+            attempts++;
+
+            // Случайным образом выбираем размер площадки в заданном диапазоне
+            float platformWidth = Random.Range(minPlatformSize.x, maxPlatformSize.x);
+            float platformLength = Random.Range(minPlatformSize.y, maxPlatformSize.y);
+
+            // Чтобы площадка полностью помещалась внутри террейна,
+            // генерируем случайный центр так, чтобы отступ от границ не меньше половины размера площадки.
+            float minX = terrainPos.x + platformWidth / 2f;
+            float maxX = terrainPos.x + terrainWidth - platformWidth / 2f;
+            float minZ = terrainPos.z + platformLength / 2f;
+            float maxZ = terrainPos.z + terrainLength - platformLength / 2f;
+
+            float randomX = Random.Range(minX, maxX);
+            float randomZ = Random.Range(minZ, maxZ);
+            Vector3 platformCenter = new Vector3(randomX, 0f, randomZ);
+
+            // Представляем площадку как прямоугольник, где:
+            // - x: левая граница (randomX - platformWidth/2),
+            // - y: нижняя граница (randomZ - platformLength/2),
+            // - width: platformWidth,
+            // - height: platformLength.
+            Rect newPlatformRect = new Rect(randomX - platformWidth / 2f, randomZ - platformLength / 2f, platformWidth, platformLength);
+
+            // Проверка на пересечения с уже созданными площадками
+            bool overlaps = false;
+            foreach (Rect placed in placedPlatforms)
+            {
+                if (newPlatformRect.Overlaps(placed))
+                {
+                    overlaps = true;
+                    break;
+                }
+            }
+
+            if (overlaps)
+            {
+                // Если перекрытие обнаружено, пропускаем эту итерацию
+                continue;
+            }
+
+            // Если площадка не пересекается с другими, создаём её с помощью функции CreateFlatPlatform.
+            // Функция сама определит среднее значение высоты выбранной области и произведёт сглаживание.
+            TerrainGenerator.CreateFlatPlatform(terrain, platformCenter, new Vector2(platformWidth, platformLength), smoothingRadius);
+
+            // Добавляем прямоугольник новой площадки для дальнейшей проверки наложений.
+            placedPlatforms.Add(newPlatformRect);
+            createdPlatforms++;
+        }
+
+        if (createdPlatforms < platformCount)
+        {
+            Debug.LogWarning($"Было создано только {createdPlatforms} площадок из {platformCount} после {attempts} попыток.");
+        }
+        else
+        {
+            Debug.Log($"Успешно размещено {createdPlatforms} площадок.");
+        }
     }
 
     private void CreateRoad(Vector3 start, Vector3 end)
