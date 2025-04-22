@@ -222,10 +222,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ca82d2629843034eaf1c4b83a8a8304, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 5278706993115044690, guid: f3fc4f2775f994a46969991141716125, type: 3}
+  terrainGenerator: {fileID: 0}
   roadPrefab: {fileID: 8953070253236969226, guid: 5f6b9078fca663549ae83ba419bd2092, type: 3}
   mapParent: {fileID: 1365826699}
   cityGraphData: {fileID: 11400000, guid: 3102e1d03f70c2c4b929cca2d72c2891, type: 2}
+  numberOfFlats: 0
+  minSize: {x: 0, y: 0}
+  maxSize: {x: 0, y: 0}
+  universityPrefab: {fileID: 0}
 --- !u!114 &291793388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -460,6 +464,18 @@ PrefabInstance:
     - target: {fileID: 5369884915000532378, guid: 3887be30232087f4ea3188e8ddbb7868, type: 3}
       propertyPath: m_Name
       value: IslandPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 7497197398328402964, guid: 3887be30232087f4ea3188e8ddbb7868, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7497197398328402964, guid: 3887be30232087f4ea3188e8ddbb7868, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7497197398328402964, guid: 3887be30232087f4ea3188e8ddbb7868, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7497197398328402964, guid: 3887be30232087f4ea3188e8ddbb7868, type: 3}
       propertyPath: m_LocalPosition.x
