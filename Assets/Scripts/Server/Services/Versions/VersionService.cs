@@ -1,5 +1,5 @@
 // Сервис для работы с версиями мира
-using System.Threading.Tasks;
+/*using System.Threading.Tasks;
 
 public class VersionService : IVersionService
 {
@@ -27,3 +27,4 @@ public class VersionService : IVersionService
         return await worldDatabase.UpdateWorldVersion(worldId, platform, version);
     }
 }
+*/

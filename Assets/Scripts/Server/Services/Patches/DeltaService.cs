@@ -1,4 +1,4 @@
-// Сервис для работы с патчами мира
+/*// Сервис для работы с патчами мира
 using System.Threading.Tasks;
 
 public class DeltaService : IDeltaService
@@ -30,4 +30,4 @@ public class DeltaService : IDeltaService
             Json = GetChangedObjects(currentSnapshot, lastKnownSnapshotHash)
         };
     }
-}
+}*/
