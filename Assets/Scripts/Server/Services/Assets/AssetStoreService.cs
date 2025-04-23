@@ -1,4 +1,4 @@
-// Сервис для работы с ассетами
+/*// Сервис для работы с ассетами
 using System.Threading.Tasks;
 using UnityEditor;
 
@@ -33,3 +33,4 @@ public class AssetStoreService : IAssetStoreService
         return await assetDatabase.SaveAssetBundle(worldId, platform, assetBundleHash, assetBundleData);
     }
 }
+*/

@@ -1,15 +1,8 @@
-// Сервис для работы с состоянием мира
+/*// Сервис для работы с состоянием мира
 using System.Threading.Tasks;
 
 public class WorldStoreService : IWorldStoreService
 {
-    private readonly IWorldDatabase worldDatabase;
-
-    // Конструктор сервиса
-    public WorldStoreService(IWorldDatabase worldDatabase)
-    {
-        this.worldDatabase = worldDatabase;
-    }
 
     /// <summary>
     /// Загружает состояние мира из базы данных
@@ -26,4 +19,4 @@ public class WorldStoreService : IWorldStoreService
     {
         return await worldDatabase.SaveSnapshot(worldId, platform, jsonData, worldSnapshotHash);
     }
-}
+}*/
