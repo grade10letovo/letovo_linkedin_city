@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent (typeof(WebSocketClient))]
 /// <summary>
 /// Компонент отслеживает движение объекта и отправляет сообщение через MessageDispatcher
 /// </summary>
