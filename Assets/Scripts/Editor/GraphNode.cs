@@ -9,8 +9,7 @@ public class GraphNode : Node
     public string nodeName;
     public string nodeID;
     public List<string> universities;
-    private List<string> dropdownOptions = new List<string> { "Brown University", "НИУ ВШЭ", "Yale University", "РАНХиГС", "Not selected" };
-
+    private List<string> dropdownOptions = new List<string> { "Brown University", "НИУ ВШЭ", "Yale University", "РАНХиГС", "Not selected" }; // Доступные опции для выбора
 
     public GraphNode(string name, Vector2 position, string nodeID = null)
     {
@@ -25,33 +24,37 @@ public class GraphNode : Node
         style.backgroundColor = new StyleColor(Color.white);
         style.width = 150;
 
+        // Создаём заголовок узла как редактируемое текстовое поле
         var titleTextField = new TextField
         {
             value = nodeName,
             style =
-            {
-                unityTextAlign = TextAnchor.MiddleCenter,
-                unityFontStyleAndWeight = FontStyle.Bold,
-                marginBottom = 10,
-                marginTop = 10
-            }
+        {
+            unityTextAlign = TextAnchor.MiddleCenter,
+            unityFontStyleAndWeight = FontStyle.Bold,
+            marginBottom = 10,
+            marginTop = 10
+        }
         };
 
         titleTextField.RegisterValueChangedCallback(evt =>
         {
-            nodeName = evt.newValue;
-            title = nodeName;
+            nodeName = evt.newValue; // Обновляем название узла
+            title = nodeName; // Обновляем заголовок в GraphView
         });
 
+        // Удаляем стандартный заголовок и добавляем новое поле
         titleContainer.Clear();
         titleContainer.Add(titleTextField);
 
+        // Создаём входной и выходной порты
         var inputPort = CreatePort("Input", Direction.Input);
         inputContainer.Add(inputPort);
 
         var outputPort = CreatePort("Output", Direction.Output);
         outputContainer.Add(outputPort);
 
+        // Список строк
         var listContainer = new VisualElement();
         listContainer.style.marginTop = 10;
 
@@ -78,8 +81,7 @@ public class GraphNode : Node
 
         mainContainer.Add(listContainer);
 
-
-
+        // Добавить возможность перемещения узла
         this.AddManipulator(new Dragger());
 
         RefreshExpandedState();
@@ -87,41 +89,38 @@ public class GraphNode : Node
         RefreshSize();
     }
 
-    public override void SetPosition(Rect newPos)
-    {
-        base.SetPosition(newPos);
-        style.left = newPos.xMin;
-        style.top = newPos.yMin;
-        UpdatePosition();
-    }
-
-    private void UpdatePosition() { }
 
     private Port CreatePort(string portName, Direction direction)
     {
         var port = InstantiatePort(Orientation.Horizontal, direction, Port.Capacity.Multi, typeof(float));
         port.portName = portName;
+
         return port;
     }
 
     private void RefreshSize()
     {
+        // Обновляем состояние нода
         RefreshExpandedState();
         RefreshPorts();
 
-        float totalHeight = 40;
+        // Высчитываем высоту контейнера
+        float totalHeight = 40; // Базовая высота узла
         foreach (var child in mainContainer.Children())
         {
             totalHeight += child.resolvedStyle.height + child.resolvedStyle.marginTop + child.resolvedStyle.marginBottom;
         }
 
-        style.height = totalHeight;
+        // Устанавливаем высоту узла с учётом содержимого
+        style.height = totalHeight; // Немного добавим для отступов
     }
+
 
     private float CalculateContainerHeight()
     {
         float height = resolvedStyle.paddingTop + resolvedStyle.paddingBottom;
 
+        // Считаем высоту всех дочерних элементов
         foreach (var child in mainContainer.Children())
         {
             height += child.resolvedStyle.height + child.resolvedStyle.marginTop + child.resolvedStyle.marginBottom;
@@ -137,6 +136,7 @@ public class GraphNode : Node
 
     private VisualElement CreateDropdownItem(string selectedItem)
     {
+        // Выпадающий список
         var dropdown = new DropdownField(dropdownOptions, selectedItem);
         dropdown.RegisterValueChangedCallback(evt =>
         {
@@ -147,17 +147,19 @@ public class GraphNode : Node
             }
         });
 
+        // Кнопка для удаления элемента
         var removeButton = new Button(() =>
         {
             universities.Remove(selectedItem);
             dropdown.parent.RemoveFromHierarchy();
-            RefreshSize();
+            RefreshSize(); // Обновляем размер при удалении элемента
         })
         {
             text = "X",
-            style = { marginLeft = 50 }
+            style = { marginLeft = 5 }
         };
 
+        // Контейнер для строки
         var itemContainer = new VisualElement();
         itemContainer.style.flexDirection = FlexDirection.Row;
         itemContainer.style.marginBottom = 5;
@@ -170,7 +172,7 @@ public class GraphNode : Node
     private void AddDropdownItem(string defaultItem, VisualElement listContainer)
     {
         universities.Add(defaultItem);
-        listContainer.Insert(listContainer.childCount - 1, CreateDropdownItem(defaultItem));
-        RefreshSize();
+        listContainer.Insert(listContainer.childCount - 1, CreateDropdownItem(defaultItem)); // Добавляем перед кнопкой
+        RefreshSize(); // Обновляем размер при добавлении нового элемента
     }
 }
