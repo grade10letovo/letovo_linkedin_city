@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: CityGraphData
   m_EditorClassIdentifier: 
   vertices:
-  - {x: 10, y: 0, z: 5}
-  - {x: 20, y: 0, z: 15}
-  - {x: 35, y: 0, z: 10}
+  - {x: 100, y: 0, z: 100}
+  - {x: 300, y: 0, z: 200}
+  - {x: 200, y: 0, z: 300}
+  - {x: 400, y: 0, z: 500}
   edges:
   - {x: 0, y: 1}
   - {x: 1, y: 2}
+  - {x: 1, y: 3}
+  - {x: 2, y: 3}
