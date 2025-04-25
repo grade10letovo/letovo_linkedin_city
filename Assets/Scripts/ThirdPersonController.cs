@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Mirror;
+using Cinemachine;
 
-public class ThirdPersonController : MonoBehaviour
+public class ThirdPersonController : NetworkBehaviour
 {
     public Text modeText;
     public CharacterController characterController;
@@ -37,6 +39,17 @@ public class ThirdPersonController : MonoBehaviour
     private float targetSpeed;
     private float currentSpeed = 0f;
     private float footstepTimer = 0f;
+    
+    public CinemachineFreeLook freeLookCam;
+    
+    void Start()
+    {
+        if (!isLocalPlayer)
+        {
+            // Удалим камеру у не-локальных игроков
+            Destroy(freeLookCam.gameObject);
+        }
+    }
 
     private void Awake()
     {
@@ -65,6 +78,10 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
+
+        if (!isLocalPlayer) return;
+
+
         isGrounded = characterController.isGrounded;
 
         if (isGrounded && velocity.y < 0)
@@ -96,23 +113,23 @@ public class ThirdPersonController : MonoBehaviour
         {
             if (inputActions.Player.Sprint.IsPressed() && !IsFacingWall())
             {
-                modeText.text = "Спринт";
+                // modeText.text = "Спринт";
                 targetSpeed = sprintSpeed;
             }
             else if (inputActions.Player.Run.IsPressed())
             {
-                modeText.text = "Бег";
+                // modeText.text = "Бег";
                 targetSpeed = runSpeed;
             }
             else
             {
-                modeText.text = "Ходьба";
+                // modeText.text = "Ходьба";
                 targetSpeed = walkSpeed;
             }
         }
         else
         {
-            modeText.text = "Остановка";
+            // modeText.text = "Остановка";
             targetSpeed = 0;
         }
 
