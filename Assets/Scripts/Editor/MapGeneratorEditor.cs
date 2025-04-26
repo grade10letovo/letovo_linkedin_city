@@ -1,19 +1,37 @@
-п»ї#if UNITY_EDITOR
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
-[CustomEditor(typeof(MapGenerator))]
-public class MapGeneratorEditor : Editor
+public class MapGeneratorEditor : EditorWindow
 {
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
+    private MapGenerator mapGenerator;
 
-        MapGenerator generator = (MapGenerator)target;
-        if (GUILayout.Button("Generate"))
+    [MenuItem("Tools/Map Generator")]
+    public static void ShowWindow()
+    {
+        GetWindow<MapGeneratorEditor>("Map Generator");
+    }
+
+    private void OnEnable()
+    {
+        if (mapGenerator == null)
         {
-            generator.GenerateMapFromEditor();
+            mapGenerator = FindObjectOfType<MapGenerator>();
+        }
+    }
+
+    private void OnGUI()
+    {
+        GUILayout.Label("Map Generator", EditorStyles.boldLabel);
+
+        if (mapGenerator == null)
+        {
+            EditorGUILayout.HelpBox("MapGenerator не найден в сцене!", MessageType.Warning);
+            return;
+        }
+
+        if (GUILayout.Button("Generate Map from Database"))
+        {
+            mapGenerator.GenerateMapFromEditor(); // Вызов генерации
         }
     }
 }
-#endif
