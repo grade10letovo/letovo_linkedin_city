@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEditor.AddressableAssets.Settings;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 public class WorldSaveManager : MonoBehaviour
 {
+#if UNITY_EDITOR
     [HideInInspector] public List<IEditorUploadable> uploadableObjects = new List<IEditorUploadable>();
 
     // Called to find all objects that implement IEditorUploadable
@@ -22,11 +25,13 @@ public class WorldSaveManager : MonoBehaviour
             }
         }
     }
-
+#endif
     // Prepare and save world data (called from Editor button)
     public void SaveWorld()
     {
+#if UNITY_EDITOR
         FindUploadableObjects();
+#endif
 
         // Collect assets by tag (used for different asset bundles)
         Dictionary<string, HashSet<Object>> assetsByTag = CollectAssetsByTag();
