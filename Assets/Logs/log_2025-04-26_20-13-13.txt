@@ -1,0 +1,15 @@
+[2025-04-26 20:13:13] [Log] [LogToFile] 📝 Logging started at: C:/Users/artem/Projects/letovo_linkedin_city/Assets\Logs\log_2025-04-26_20-13-13.txt
+[2025-04-26 20:13:13] [Log] [LogToFile] 📝 Logging started at: C:/Users/artem/Projects/letovo_linkedin_city/Assets\Logs\log_2025-04-26_20-13-13.txt
+[2025-04-26 20:13:13] [Log] [AUTH] 🔐 Sending token: token1
+[2025-04-26 20:13:14] [Warning] [CLIENT] ⚠️ WebSocket not ready, skipping send
+[2025-04-26 20:13:14] [Warning] [CLIENT] ⚠️ WebSocket not ready, skipping send
+[2025-04-26 20:13:14] [Log] [AUTH] 📥 Response: {"playerId":"CoolCat","valid":true}
+
+[2025-04-26 20:13:14] [Log] [AUTH] ✅ Authorized as CoolCat
+[2025-04-26 20:13:14] [Log] [CLIENT] ✅ Connected
+[2025-04-26 20:13:14] [Log] [CLIENT] 📤 Sent player_joined: {"playerId":"CoolCat","playerPosition":{"x":0.0,"y":-0.153000116,"z":0.0}}
+[2025-04-26 20:13:14] [Log] [WORLD] 🌍 Received snapshot with 0 players
+[2025-04-26 20:13:14] [Log] [CLIENT] 📤 Received world_snapshot: {
+  "players": null
+}
+[2025-04-26 20:13:15] [Log] [CLIENT] 🔚 Closing WebSocket connection...

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -18,18 +18,19 @@ public class ConfigLoader
     }
     public static string LoadUrl(string additional_url, string protocol="https")
     {
-        string projectRootPath = Path.GetFullPath(Path.Combine(Application.dataPath, "Config/config.json"));
+        string projectRootPath = Path.GetFullPath(Path.Combine(Application.streamingAssetsPath, "Config/config.json"));
         var config = LoadConfig<Config>(projectRootPath);
         if (config != null)
         {
             return protocol + "://" + config.serverUrl + "/" + additional_url;
-        }
+        }       
         else
         {
             Debug.LogError("Failed to load Auth config.");
             return null;
         }
     }
+
     private string LoadToken()
     {
         if (PlayerPrefs.HasKey("AuthToken"))

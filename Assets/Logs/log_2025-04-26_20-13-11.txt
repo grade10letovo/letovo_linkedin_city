@@ -1,0 +1,1 @@
+[2025-04-26 20:13:11] [Log] [LogToFile] 📝 Logging started at: C:/Users/artem/Projects/letovo_linkedin_city/Assets\Logs\log_2025-04-26_20-13-11.txt
