@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Bro_01
-    second: {fileID: 2100000, guid: f81847d367ed657499df4527eb233cb2, type: 2}
+    second: {fileID: 2100000, guid: 0bac129b041d8764b9b44134180c9279, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Facial
-    second: {fileID: 2100000, guid: d05ff70585c8da042892a8b6e10eaacc, type: 2}
+    second: {fileID: 2100000, guid: 0bac129b041d8764b9b44134180c9279, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Hair
-    second: {fileID: 2100000, guid: bd0fdba637f02ff45aea14a58353b540, type: 2}
+    second: {fileID: 2100000, guid: e402de56ca981421cbbd922919787c15, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
