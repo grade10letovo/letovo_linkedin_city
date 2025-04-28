@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Bro_01
-    second: {fileID: 2100000, guid: 0bac129b041d8764b9b44134180c9279, type: 2}
+    second: {fileID: -983659754763775572, guid: 381366fb0e791fb498d9c5157cf3905e, type: 3}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Facial
-    second: {fileID: 2100000, guid: 0bac129b041d8764b9b44134180c9279, type: 2}
+    second: {fileID: -983659754763775572, guid: 381366fb0e791fb498d9c5157cf3905e, type: 3}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
