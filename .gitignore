@@ -227,8 +227,8 @@ $RECYCLE.BIN/
 
 # Ignore all .meta files except those in the Scenes folder
 *.meta
-!Assets/Scenes/*.meta
-!Assets/Prefabs/*.meta
+!Assets/**/.meta
+!ProjectSettings/**/.meta
 
 
 # End of https://www.toptal.com/developers/gitignore/api/unity,rider,macos,windows,linux
