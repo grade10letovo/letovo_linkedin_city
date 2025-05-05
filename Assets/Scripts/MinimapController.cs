@@ -38,8 +38,8 @@ public class MinimapController : MonoBehaviour
     void Start()
     {
         panelRect = minimapPanel.GetComponent<RectTransform>();
-        //LoadGraphDataFromDatabase();
-        MockGraphData();
+        LoadGraphDataFromDatabase();
+        //MockGraphData();
         HideMinimap();
         DrawMap();
     }
@@ -141,35 +141,35 @@ public class MinimapController : MonoBehaviour
         return pos;
     }
 
-    void MockGraphData()
-    {
-        vertices = new List<Vector2>
-    {
-        new Vector2( 0f,  0f),
-        new Vector2(10f,  0f),
-        new Vector2( 5f, 10f),
-    };
+    //void MockGraphData()
+    //{
+    //    vertices = new List<Vector2>
+    //{
+    //    new Vector2( 0f,  0f),
+    //    new Vector2(10f,  0f),
+    //    new Vector2( 5f, 10f),
+    //};
 
-        edges = new List<Vector2Int>
-    {
-        new Vector2Int(0, 1),
-        new Vector2Int(1, 2),
-        new Vector2Int(2, 0),
-    };
+    //    edges = new List<Vector2Int>
+    //{
+    //    new Vector2Int(0, 1),
+    //    new Vector2Int(1, 2),
+    //    new Vector2Int(2, 0),
+    //};
 
-        if (vertices.Count > 0)
-        {
-            minCoord = vertices[0];
-            maxCoord = vertices[0];
-            foreach (var v in vertices)
-            {
-                minCoord = Vector2.Min(minCoord, v);
-                maxCoord = Vector2.Max(maxCoord, v);
-            }
-        }
+    //    if (vertices.Count > 0)
+    //    {
+    //        minCoord = vertices[0];
+    //        maxCoord = vertices[0];
+    //        foreach (var v in vertices)
+    //        {
+    //            minCoord = Vector2.Min(minCoord, v);
+    //            maxCoord = Vector2.Max(maxCoord, v);
+    //        }
+    //    }
 
-        Debug.Log($"[Minimap] Mocked {vertices.Count} vertices and {edges.Count} edges.");
-    }
+    //    Debug.Log($"[Minimap] Mocked {vertices.Count} vertices and {edges.Count} edges.");
+    //}
 
     public void DrawMap()
     {
