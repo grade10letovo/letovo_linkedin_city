@@ -33,9 +33,13 @@ public class MinimapController : MonoBehaviour
     private Vector2 minCoord;
     private Vector2 maxCoord;
 
+    private RectTransform panelRect;
+
     void Start()
     {
-        LoadGraphDataFromDatabase();
+        panelRect = minimapPanel.GetComponent<RectTransform>();
+        //LoadGraphDataFromDatabase();
+        MockGraphData();
         HideMinimap();
         DrawMap();
     }
@@ -66,10 +70,6 @@ public class MinimapController : MonoBehaviour
     {
         isVisible = !isVisible;
         minimapPanel.gameObject.SetActive(isVisible);
-        if (isVisible)
-        {
-            CenterMapOnPlayer();
-        }
     }
 
     void HideMinimap()
@@ -136,7 +136,39 @@ public class MinimapController : MonoBehaviour
         normalized.y /= size.y;
 
         Vector2 mapSize = mapArea.rect.size;
-        return new Vector2(normalized.x * mapSize.x, normalized.y * mapSize.y);
+        Vector2 pos = new Vector2(normalized.x * mapSize.x, normalized.y * mapSize.y);
+        pos -= mapSize * 0.5f;
+        return pos;
+    }
+
+    void MockGraphData()
+    {
+        vertices = new List<Vector2>
+    {
+        new Vector2( 0f,  0f),
+        new Vector2(10f,  0f),
+        new Vector2( 5f, 10f),
+    };
+
+        edges = new List<Vector2Int>
+    {
+        new Vector2Int(0, 1),
+        new Vector2Int(1, 2),
+        new Vector2Int(2, 0),
+    };
+
+        if (vertices.Count > 0)
+        {
+            minCoord = vertices[0];
+            maxCoord = vertices[0];
+            foreach (var v in vertices)
+            {
+                minCoord = Vector2.Min(minCoord, v);
+                maxCoord = Vector2.Max(maxCoord, v);
+            }
+        }
+
+        Debug.Log($"[Minimap] Mocked {vertices.Count} vertices and {edges.Count} edges.");
     }
 
     public void DrawMap()
@@ -184,40 +216,20 @@ public class MinimapController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                mapArea.parent.GetComponent<RectTransform>(), Input.mousePosition, null, out dragStartPos);
+                panelRect, Input.mousePosition, null, out dragStartPos);
             mapStartPos = mapArea.anchoredPosition;
             dragging = true;
         }
         if (Input.GetMouseButton(0) && dragging)
         {
-            Vector2 currentMousePos;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                mapArea.parent.GetComponent<RectTransform>(), Input.mousePosition, null, out currentMousePos);
-
+                panelRect, Input.mousePosition, null, out var currentMousePos);
             Vector2 diff = currentMousePos - dragStartPos;
             Vector2 targetPos = mapStartPos + diff;
             mapArea.anchoredPosition = ClampMapPosition(targetPos);
         }
         if (Input.GetMouseButtonUp(0))
-        {
             dragging = false;
-        }
-    }
-
-    Vector2 ClampMapPosition(Vector2 pos)
-    {
-        RectTransform parentRect = mapArea.parent.GetComponent<RectTransform>();
-
-        Vector2 mapSize = mapArea.rect.size * mapArea.localScale.x;
-        Vector2 viewSize = parentRect.rect.size;
-
-        Vector2 minPos = viewSize - mapSize;
-        Vector2 maxPos = Vector2.zero;
-
-        pos.x = Mathf.Clamp(pos.x, minPos.x, maxPos.x);
-        pos.y = Mathf.Clamp(pos.y, minPos.y, maxPos.y);
-
-        return pos;
     }
 
     void HandleZooming()
@@ -227,17 +239,35 @@ public class MinimapController : MonoBehaviour
         {
             float newScale = Mathf.Clamp(mapArea.localScale.x + scroll * zoomSpeed, minZoom, maxZoom);
             mapArea.localScale = new Vector3(newScale, newScale, 1f);
+            mapArea.anchoredPosition = ClampMapPosition(mapArea.anchoredPosition);
         }
     }
 
-    void CenterMapOnPlayer()
+    private Vector2 ClampMapPosition(Vector2 targetPos, float overshoot = 50f)
     {
-        if (playerTransform == null) return;
+        Vector2 mapSize = mapArea.rect.size * mapArea.localScale.x;
+        Vector2 panelSize = panelRect.rect.size;
 
-        Vector2 playerWorldPos = new Vector2(playerTransform.position.x, playerTransform.position.z);
-        Vector2 playerMapPos = WorldToMapPosition(playerWorldPos);
+        float halfMapW = mapSize.x * 0.5f;
+        float halfMapH = mapSize.y * 0.5f;
+        float halfPanelW = panelSize.x * 0.5f;
+        float halfPanelH = panelSize.y * 0.5f;
 
-        Vector2 screenCenter = mapArea.parent.GetComponent<RectTransform>().rect.size / 2f;
-        mapArea.anchoredPosition = screenCenter - playerMapPos;
+        float minX = -halfMapW + halfPanelW;
+        float maxX = halfMapW - halfPanelW;
+        float minY = -halfMapH + halfPanelH;
+        float maxY = halfMapH - halfPanelH;
+
+        if (mapSize.x <= panelSize.x) minX = maxX = 0;
+        if (mapSize.y <= panelSize.y) minY = maxY = 0;
+
+        minX -= overshoot;
+        maxX += overshoot;
+        minY -= overshoot;
+        maxY += overshoot;
+
+        float clampedX = Mathf.Clamp(targetPos.x, minX, maxX);
+        float clampedY = Mathf.Clamp(targetPos.y, minY, maxY);
+        return new Vector2(clampedX, clampedY);
     }
 }
