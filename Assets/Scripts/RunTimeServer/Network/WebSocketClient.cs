@@ -45,8 +45,10 @@ public class WebSocketClient : MonoBehaviour
 
     void Update()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         if (websocket != null)
             websocket.DispatchMessageQueue();
+#endif
     }
 
     private void OnEnable()
