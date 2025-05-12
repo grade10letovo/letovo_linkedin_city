@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Npgsql;
 
 public class MinimapController : MonoBehaviour
@@ -34,6 +35,8 @@ public class MinimapController : MonoBehaviour
     private Vector2 maxCoord;
 
     private RectTransform panelRect;
+
+    private List<string> vertexNames = new List<string>();
 
     void Start()
     {
@@ -80,14 +83,15 @@ public class MinimapController : MonoBehaviour
 
     void LoadGraphDataFromDatabase()
     {
-        vertices = new List<Vector2>();
-        edges = new List<Vector2Int>();
+        vertices.Clear();
+        edges.Clear();
+        vertexNames.Clear();
 
         using (var conn = new NpgsqlConnection(ConnectionString))
         {
             conn.Open();
 
-            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord FROM Vertices", conn))
+            using (var cmd = new NpgsqlCommand("SELECT x_coord, y_coord, name FROM Vertices", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -141,42 +145,40 @@ public class MinimapController : MonoBehaviour
         return pos;
     }
 
-    //void MockGraphData()
-    //{
-    //    vertices = new List<Vector2>
-    //{
-    //    new Vector2( 0f,  0f),
-    //    new Vector2(10f,  0f),
-    //    new Vector2( 5f, 10f),
-    //};
+    void MockGraphData()
+    {
+        vertices = new List<Vector2>
+    {
+        new Vector2( 0f,  0f),
+        new Vector2(10f,  0f),
+        new Vector2( 5f, 10f),
+    };
 
-    //    edges = new List<Vector2Int>
-    //{
-    //    new Vector2Int(0, 1),
-    //    new Vector2Int(1, 2),
-    //    new Vector2Int(2, 0),
-    //};
+        edges = new List<Vector2Int>
+    {
+        new Vector2Int(0, 1),
+        new Vector2Int(1, 2),
+        new Vector2Int(2, 0),
+    };
 
-    //    if (vertices.Count > 0)
-    //    {
-    //        minCoord = vertices[0];
-    //        maxCoord = vertices[0];
-    //        foreach (var v in vertices)
-    //        {
-    //            minCoord = Vector2.Min(minCoord, v);
-    //            maxCoord = Vector2.Max(maxCoord, v);
-    //        }
-    //    }
+        if (vertices.Count > 0)
+        {
+            minCoord = vertices[0];
+            maxCoord = vertices[0];
+            foreach (var v in vertices)
+            {
+                minCoord = Vector2.Min(minCoord, v);
+                maxCoord = Vector2.Max(maxCoord, v);
+            }
+        }
 
-    //    Debug.Log($"[Minimap] Mocked {vertices.Count} vertices and {edges.Count} edges.");
-    //}
+        Debug.Log($"[Minimap] Mocked {vertices.Count} vertices and {edges.Count} edges.");
+    }
 
     public void DrawMap()
     {
         foreach (var obj in spawnedObjects)
-        {
             Destroy(obj);
-        }
         spawnedObjects.Clear();
 
         for (int i = 0; i < vertices.Count; i++)
@@ -184,7 +186,16 @@ public class MinimapController : MonoBehaviour
             Vector2 pos = vertices[i];
             GameObject v = Instantiate(vertexPrefab, mapArea);
             v.GetComponent<RectTransform>().anchoredPosition = WorldToMapPosition(pos);
+
+            var label = v.GetComponentInChildren<Text>();
+            if (label != null)
+            {
+                label.text = vertexNames[i];
+                label.rectTransform.anchoredPosition += new Vector2(0, 15);
+            }
+
             spawnedObjects.Add(v);
+
         }
 
         foreach (var edge in edges)
