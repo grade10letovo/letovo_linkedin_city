@@ -2,30 +2,40 @@
 using UnityEngine.Networking;
 using System.Collections;
 using System;
+using System.IO;
 
 public class AuthService : MonoBehaviour
 {
-    [Header("Server Settings")]
-    public string baseUrl = "http://localhost:8080";
-    public string token = "dev-token-123";
-
+    private string _authUrl;
+    private string _token;
     public Action<string> OnLoginSuccess;
     public Action<string> OnLoginError;
+    private void LoadToken()
+    {
+        if (PlayerPrefs.HasKey("AuthToken"))
+        {
+            _token = PlayerPrefs.GetString("AuthToken");
+        }
+        else
+        {
+            Debug.LogError("No AuthToken found in PlayerPrefs.");
+        }
+    }
 
     public void Authenticate()
     {
+        _authUrl= ConfigLoader.LoadUrl("auth/validate-token", "http");
+        LoadToken();
         StartCoroutine(SendAuthRequest());
     }
 
     private IEnumerator SendAuthRequest()
     {
-        string url = $"{baseUrl}/auth/validate-token";
-
-        UnityWebRequest request = UnityWebRequest.PostWwwForm(url, "");
-        request.SetRequestHeader("Authorization", $"Bearer {token}");
+        UnityWebRequest request = UnityWebRequest.PostWwwForm(_authUrl, "");
+        request.SetRequestHeader("Authorization", $"Bearer {_token}");
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        Debug.Log($"[AUTH] 🔐 Sending token: {token}");
+        Debug.Log($"[AUTH] 🔐 Sending token: {_token}");
 
         yield return request.SendWebRequest();
 

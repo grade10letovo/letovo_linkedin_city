@@ -8,7 +8,7 @@ public class WebSocketClient : MonoBehaviour
     private WebSocket websocket;
     public string playerId = "player-" + System.Guid.NewGuid().ToString().Substring(0, 6);
 
-    private Dictionary<string, GameObject> otherPlayers = new();
+    private Dictionary<string, Player> players = new();
 
     public Transform myPlayer;
 
@@ -29,8 +29,13 @@ public class WebSocketClient : MonoBehaviour
         }
     }
 
-    private void Start()
+    public void Start()
     {
+        StartClient();
+    }
+
+    public void StartClient() 
+    { 
         AuthService auth = FindObjectOfType<AuthService>();
         auth.OnLoginSuccess += OnAuthSuccess;
         auth.OnLoginError += OnAuthFailed;
@@ -40,8 +45,10 @@ public class WebSocketClient : MonoBehaviour
 
     void Update()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         if (websocket != null)
             websocket.DispatchMessageQueue();
+#endif
     }
 
     private void OnEnable()
@@ -66,17 +73,28 @@ public class WebSocketClient : MonoBehaviour
     }
     private async void ConnectWebSocket()
     {
-        websocket = new WebSocket("ws://localhost:8080/ws");
+        string url = ConfigLoader.LoadUrl("ws", "ws");
+        websocket = new WebSocket(url);
 
-        websocket.OnOpen += () => {
+        websocket.OnOpen += () =>
+        {
             Debug.Log("[CLIENT] ✅ Connected");
-            MessageDispatcher.Send("player_joined", new JoinedMessage { playerId = playerId });
+            MessageDispatcher.Send("player_joined", new JoinedMessage
+            {
+                playerId = playerId,
+                playerPosition = new Vec3
+                {
+                    x = myPlayer.position.x,
+                    y = myPlayer.position.y
+                }
+            });
         };
 
         websocket.OnMessage += (bytes) => {
             string raw = System.Text.Encoding.UTF8.GetString(bytes);
             var wrapper = JsonConvert.DeserializeObject<NetworkMessage>(raw);
             MessageDispatcher.Receive(wrapper.type, JsonConvert.SerializeObject(wrapper.data));
+            Debug.Log($"[CLIENT] 📤 Received {wrapper.type}: {wrapper.data}");
         };
 
         websocket.OnError += (err) => Debug.LogError($"[CLIENT] ❌ Error: {err}");

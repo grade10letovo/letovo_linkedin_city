@@ -19,7 +19,7 @@ public class MoveDetector : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    void Update()
+    /*void Update()
     {
         timer += Time.deltaTime;
 
@@ -36,7 +36,7 @@ public class MoveDetector : MonoBehaviour
 
             timer = 0;
         }
-    }
+    }*/
 
     void SendMove(Vector3 pos)
     {

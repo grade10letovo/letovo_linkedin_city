@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if UNITY_EDITOR
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor;
+#endif
 using UnityEngine;
 
 public class WorldSaveManager : MonoBehaviour
 {
+#if UNITY_EDITOR
     [HideInInspector] public List<IEditorUploadable> uploadableObjects = new List<IEditorUploadable>();
 
     // Called to find all objects that implement IEditorUploadable
@@ -22,7 +25,6 @@ public class WorldSaveManager : MonoBehaviour
             }
         }
     }
-
     // Prepare and save world data (called from Editor button)
     public void SaveWorld()
     {
@@ -37,6 +39,7 @@ public class WorldSaveManager : MonoBehaviour
         // Process and upload data to server
         StartCoroutine(UploadDataToServer(assetsByTag, snapshotData));
     }
+
 
     private Dictionary<string, HashSet<Object>> CollectAssetsByTag()
     {
@@ -58,7 +61,6 @@ public class WorldSaveManager : MonoBehaviour
 
         return assetsByTag;
     }
-
     private object PrepareSnapshot(List<IEditorUploadable> uploadableObjects)
     {
         var snapshotData = new List<ObjectSnapshot>();
@@ -117,6 +119,8 @@ public class WorldSaveManager : MonoBehaviour
 
         return string.Join(",", bundlePaths);
     }
+#endif
+
 
     private IEnumerator SendBundleToServer(string bundlePath)
     {
