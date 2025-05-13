@@ -96,23 +96,23 @@ public class ThirdPersonController : MonoBehaviour
         {
             if (inputActions.Player.Sprint.IsPressed() && !IsFacingWall())
             {
-                modeText.text = "Спринт";
+                // modeText.text = "Спринт";
                 targetSpeed = sprintSpeed;
             }
             else if (inputActions.Player.Run.IsPressed())
             {
-                modeText.text = "Бег";
+                // modeText.text = "Бег";
                 targetSpeed = runSpeed;
             }
             else
             {
-                modeText.text = "Ходьба";
+                // modeText.text = "Ходьба";
                 targetSpeed = walkSpeed;
             }
         }
         else
         {
-            modeText.text = "Остановка";
+            // modeText.text = "Остановка";
             targetSpeed = 0;
         }
 
