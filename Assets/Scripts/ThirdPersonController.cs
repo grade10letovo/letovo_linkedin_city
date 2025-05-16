@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Mirror;
 
-public class ThirdPersonController : MonoBehaviour
+public class ThirdPersonController : NetworkBehaviour
 {
     public Text modeText;
     public CharacterController characterController;
@@ -65,6 +66,7 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
+        if (!isLocalPlayer) return;
         isGrounded = characterController.isGrounded;
 
         if (isGrounded && velocity.y < 0)
