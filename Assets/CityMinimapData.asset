@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vertices:
   - position: {x: 1, y: 5}
-    vertexName: A
+    vertexName: Higher School of Economics
   - position: {x: 2, y: 5}
-    vertexName: B
+    vertexName: Moscow State Univeristy
   edges:
   - startIndex: 0
     endIndex: 1

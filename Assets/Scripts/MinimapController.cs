@@ -1,8 +1,7 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using UnityEngine;
-using TMPro;              // подключаем TextMeshPro
+using TMPro;              // РїРѕРґРєР»СЋС‡Р°РµРј TextMeshPro
 using UnityEngine.UI;
-
 public class MinimapController : MonoBehaviour
 {
     [Header("References")]
@@ -15,7 +14,7 @@ public class MinimapController : MonoBehaviour
     public GameObject minimapPanel;
 
     [Header("Graph Data")]
-    public MinimapGraphData graphData;  // ScriptableObject с данными
+    public MinimapGraphData graphData;  // ScriptableObject СЃ РґР°РЅРЅС‹РјРё
 
     [Header("Map Settings")]
     public float zoomSpeed = 0.1f;
@@ -45,7 +44,7 @@ public class MinimapController : MonoBehaviour
 
         if (isVisible)
         {
-            HandleDragging();
+            //HandleDragging();
             HandleZooming();
         }
     }
@@ -89,19 +88,19 @@ public class MinimapController : MonoBehaviour
 
     public void DrawMap()
     {
-        // очистка
+        // РѕС‡РёСЃС‚РєР°
         foreach (var obj in spawnedObjects)
             Destroy(obj);
         spawnedObjects.Clear();
 
-        // вершины
+        // РІРµСЂС€РёРЅС‹
         for (int i = 0; i < graphData.vertices.Count; i++)
         {
             var vData = graphData.vertices[i];
             var vObj = Instantiate(vertexPrefab, mapArea);
             vObj.GetComponent<RectTransform>().anchoredPosition = WorldToMapPosition(vData.position);
 
-            // теперь TMP_Text
+            // С‚РµРїРµСЂСЊ TMP_Text
             var label = vObj.GetComponentInChildren<TMP_Text>();
             if (label != null)
             {
@@ -112,7 +111,7 @@ public class MinimapController : MonoBehaviour
             spawnedObjects.Add(vObj);
         }
 
-        // рёбра
+        // СЂС‘Р±СЂР°
         foreach (var eData in graphData.edges)
         {
             Vector2 p1 = WorldToMapPosition(graphData.vertices[eData.startIndex].position);
@@ -129,7 +128,7 @@ public class MinimapController : MonoBehaviour
             spawnedObjects.Add(eObj);
         }
 
-        // иконка игрока
+        // РёРєРѕРЅРєР° РёРіСЂРѕРєР°
         if (playerIconInstance == null && playerTransform != null)
             playerIconInstance = Instantiate(playerIconPrefab, mapArea);
     }
@@ -140,24 +139,50 @@ public class MinimapController : MonoBehaviour
         playerIconInstance.GetComponent<RectTransform>().anchoredPosition = WorldToMapPosition(worldPos);
     }
 
-    void HandleDragging()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                panelRect, Input.mousePosition, null, out dragStartPos);
-            mapStartPos = mapArea.anchoredPosition;
-            dragging = true;
-        }
-        else if (Input.GetMouseButton(0) && dragging)
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                panelRect, Input.mousePosition, null, out Vector2 curr);
-            mapArea.anchoredPosition = ClampMapPosition(mapStartPos + (curr - dragStartPos));
-        }
-        else if (Input.GetMouseButtonUp(0))
-            dragging = false;
-    }
+    //void HandleDragging()
+    //{
+    //    // РќР°Р¶Р°С‚РёРµ Р›РљРњ
+    //    if (Input.GetMouseButtonDown(0))
+    //    {
+    //        bool inside = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+    //            panelRect, Input.mousePosition, null, out dragStartPos);
+
+    //        Debug.Log($"[Minimap] MouseDown at screen {Input.mousePosition} в†’ insidePanel: {inside}, dragStartPos: {dragStartPos}");
+
+    //        if (inside)
+    //        {
+    //            mapStartPos = mapArea.anchoredPosition;
+    //            dragging = true;
+    //            Debug.Log($"[Minimap] Begin dragging. mapStartPos: {mapStartPos}");
+    //        }
+    //    }
+    //    // РЈРґРµСЂР¶Р°РЅРёРµ Р›РљРњ
+    //    else if (Input.GetMouseButton(0))
+    //    {
+    //        Debug.Log($"[Minimap] Mouse held. dragging={dragging}");
+    //        if (dragging)
+    //        {
+    //            bool inside = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+    //                panelRect, Input.mousePosition, null, out Vector2 currentMousePos);
+
+    //            Vector2 diff = currentMousePos - dragStartPos;
+    //            Vector2 newAnchored = mapStartPos + diff;
+
+    //            Debug.Log($"[Minimap] insidePanel: {inside}, currentMousePos: {currentMousePos}, diff: {diff}, newAnchored: {newAnchored}");
+
+    //            mapArea.anchoredPosition = ClampMapPosition(newAnchored);
+    //        }
+    //    }
+    //    // РћС‚РїСѓСЃРєР°РЅРёРµ Р›РљРњ
+    //    else if (Input.GetMouseButtonUp(0))
+    //    {
+    //        Debug.Log($"[Minimap] MouseUp. dragging was {dragging}");
+    //        dragging = false;
+    //    }
+    //}
+
+
+
 
     void HandleZooming()
     {
