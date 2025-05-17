@@ -13,10 +13,16 @@ MonoBehaviour:
   m_Name: CityMinimapData
   m_EditorClassIdentifier: 
   vertices:
-  - position: {x: 1, y: 5}
+  - position: {x: 1, y: 0}
     vertexName: Higher School of Economics
-  - position: {x: 2, y: 5}
+  - position: {x: 1, y: 10}
     vertexName: Moscow State Univeristy
+  - position: {x: 2, y: 5}
+    vertexName: Moscow Institute of Physic and Technology
   edges:
   - startIndex: 0
     endIndex: 1
+  - startIndex: 0
+    endIndex: 2
+  - startIndex: 1
+    endIndex: 2
